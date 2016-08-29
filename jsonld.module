@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Adds support for serializing entities to JSON-LD / LDP for the islandora CLAW Project.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function jsonld_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.hal':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= t('<p><a href=":jsonld_spec">JSON-LD</a>, or JavaScript Object Notation for Linked Data, is
+        a method of encoding Linked Data using JSON.</p>', array(':jsonld_spec' => 'http://json-ld.org/spec/latest/json-ld-syntax/'));
+      $output .= '<p>It was a goal to require as little effort as possible from 
+        developers to transform their existing JSON to JSON-LD.</p>';
+      $output .= '<p>This allows data to be serialized in a way that is similar 
+        to traditional JSON.';
+      $output .= '<p>It is a World Wide Web Consortium Recommendation.</p>';
+      $output .= ' <p>It was initially developed by the JSON for Linking Data 
+        Community Group before being transferred to the RDF Working Group for';
+      $output .= ' review, improvement, and standardization</p>';
+
+      return $output;
+  }
+}

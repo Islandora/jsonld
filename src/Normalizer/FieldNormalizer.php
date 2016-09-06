@@ -45,12 +45,17 @@ class FieldNormalizer extends NormalizerBase {
       }
     }
 
-    // Merge deep so that links set in entity reference normalizers are merged
-    // into the links property.
     $normalized = NestedArray::mergeDeepArray($normalized_field_items);
-    return $normalized;
+    // I'm really not sure if this is the best approach
+    // but in my defense, it works.
+    if (!isset($normalized['@graph'])) {
+      $normalized_in_context['@graph'][$context['current_entity_id']] = $normalized;
+    }
+    else {
+      $normalized_in_context = $normalized;
+    }
+    return $normalized_in_context;
   }
-
 
   /**
    * {@inheritdoc}

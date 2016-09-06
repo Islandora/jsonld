@@ -21,19 +21,61 @@ class FieldItemNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function normalize($field_item, $format = NULL, array $context = array()) {
-    $values = $field_item->toArray();
-    if (isset($context['langcode'])) {
-      $values['lang'] = $context['langcode'];
-    }
 
-    // The values are wrapped in an array, and then wrapped in another array
-    // keyed by field name so that field items can be merged by the
-    // FieldNormalizer. This is necessary for the EntityReferenceItemNormalizer
-    // to be able to place values in the '_links' array.
+    // @TODO Understand Drupal complex fields to RDF mapping
+    // Fields can be complex, with multiple subfields
+    // but i'm not sure if rdf module
+    // is able to assign that, so investigate:
+    $values = $field_item->toArray();
+    // For now we will just pass @value and @language to json-ld
+    // Until we find a way of mapping to rdf subfields.
+    $values_clean = array();
+    $normalized = array();
     $field = $field_item->getParent();
-    return array(
-      $field->getName() => array($values),
-    );
+    if (!isset($values['value'])) {
+      // Makes little sense to add to json-ld without a value.
+      return [];
+    }
+    else {
+      $values_clean['@value'] = $values['value'];
+      if (isset($context['current_entity_rdf_mapping'])) {
+        // So why i am passing the whole rdf mapping object and not
+        // only the predicate? Well because i hope i will be able
+        // to MAP to RDF also sub fields of a complex field someday
+        // and somehow.
+        $field_mappings = $context['current_entity_rdf_mapping']->getPreparedFieldMapping($field->getName());
+        $field_keys = isset($field_mappings['properties']) ? $field_mappings['properties'] : array($field->getName());
+        if (!empty($field_mappings['datatype'])) {
+          $values_clean['@type'] = $field_mappings['datatype'];
+        }
+
+        // Well, this is json-ld but $field_item->toArray() depends on
+        // each field implementation and some don't have 'value key'
+        // Maybe i should handle them as _blank nodes?
+        // For now this is a dirty solution.
+        if (!empty($field_mappings['datatype_callback'])) {
+          $callback = $field_mappings['datatype_callback']['callable'];
+          $arguments = isset($field_mappings['datatype_callback']['arguments']) ? $field_mappings['datatype_callback']['arguments'] : NULL;
+          $values_clean['@value'] = call_user_func($callback, $values, $arguments);
+        }
+      }
+      else {
+        $field_keys = array($field->getName());
+      }
+
+      if (isset($context['langcode'])) {
+        $values_clean['@language'] = $context['langcode'];
+      }
+      array_filter($values_clean);
+      // The values are wrapped in an array, and then wrapped in another array
+      // keyed by field name so that field items can be merged by the
+      // FieldNormalizer.
+      foreach ($field_keys as $field_name) {
+        $normalized[$field_name] = array($values_clean);
+      }
+
+      return $normalized;
+    }
   }
 
   /**

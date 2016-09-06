@@ -2,6 +2,7 @@
 
 namespace Drupal\jsonld\Normalizer;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\rest\LinkManager\LinkManagerInterface;
 use Drupal\serialization\EntityResolver\EntityResolverInterface;
@@ -52,43 +53,72 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
   public function normalize($field_item, $format = NULL, array $context = array()) {
     /** @var $field_item \Drupal\Core\Field\FieldItemInterface */
     $target_entity = $field_item->get('entity')->getValue();
-
+    $normalized_prop = array();
     // If this is not a content entity, let the parent implementation handle it,
     // only content entities are supported as embedded resources.
     if (!($target_entity instanceof FieldableEntityInterface)) {
       return parent::normalize($field_item, $format, $context);
     }
-
     // If the parent entity passed in a langcode, unset it before normalizing
     // the target entity. Otherwise, untranslatable fields of the target entity
     // will include the langcode.
     $langcode = isset($context['langcode']) ? $context['langcode'] : NULL;
     unset($context['langcode']);
+    // Limiting to uuid makes sure that we only get one child from base entity
+    // if not we could end traversing forever since there is no way
+    // we can enforce acyclic entity references.
     $context['included_fields'] = array('uuid');
-
+    $context['needs_jsonldcontext'] = FALSE;
+    $context['embedded'] = TRUE;
     // Normalize the target entity.
+    // This will call \Drupal\jsonld\Normalizer\ContentEntityNormalizer.
     $embedded = $this->serializer->normalize($target_entity, $format, $context);
-    $link = $embedded['_links']['self'];
-    // If the field is translatable, add the langcode to the link relation
-    // object. This does not indicate the language of the target entity.
-    if ($langcode) {
-      $embedded['lang'] = $link['lang'] = $langcode;
+
+
+   if (isset($context['current_entity_rdf_mapping'])) {
+      // So why i am passing the whole rdf mapping object and not
+      // only the predicate? Well because i hope i will be able
+      // to MAP to RDF also sub fields of a complex field someday
+      // and somehow.
+      $field_mappings = $context['current_entity_rdf_mapping']->getPreparedFieldMapping($field_item->getParent()
+        ->getName());
+      $field_keys = isset($field_mappings['properties']) ?
+        $field_mappings['properties'] :
+        [$field_item->getParent()->getName()];
+      if (!empty($field_mappings['datatype'])) {
+        $values_clean['@type'] = $field_mappings['datatype'];
+      }
+
+      // Value in this case is the target entity, so if a callback exists
+      // it should work against that?
+      if (!empty($field_mappings['datatype_callback'])) {
+        $callback = $field_mappings['datatype_callback']['callable'];
+        $arguments = isset($field_mappings['datatype_callback']['arguments']) ? $field_mappings['datatype_callback']['arguments'] : NULL;
+        $values_clean['@value'] = call_user_func($callback, $target_entity, $arguments);
+      }
+      // Since getting the to embed entity URL here could be a little bit
+      // expensive and would require an helper method
+      // i could just borrow it from the $embed result.
+      $values_clean['@id'] = key($embedded['@graph']);
+
+      // The returned structure will be recursively merged into the normalized
+      // JSON-LD @Graph
+      $entity = $field_item->getEntity();
+      $field_uri = $this->linkManager->getRelationUri($entity->getEntityTypeId(), $entity->bundle(), $field_name, $context);
+      foreach ($field_keys as $field_name) {
+        $normalized_prop[$field_name] = array($values_clean);
+      }
+
     }
 
-    // The returned structure will be recursively merged into the normalized
-    // entity so that the items are properly added to the _links and _embedded
-    // objects.
-    $field_name = $field_item->getParent()->getName();
-    $entity = $field_item->getEntity();
-    $field_uri = $this->linkManager->getRelationUri($entity->getEntityTypeId(), $entity->bundle(), $field_name, $context);
-    return array(
-      '_links' => array(
-        $field_uri => array($link),
-      ),
-      '_embedded' => array(
-        $field_uri => array($embedded),
-      ),
-    );
+    $normalized_in_context = $embedded;
+    $normalized_in_context = array_merge_recursive($normalized_in_context, array('@graph' => array($context['current_entity_id'] => $normalized_prop)));
+
+
+
+    return $normalized_in_context;
+
+
   }
 
   /**

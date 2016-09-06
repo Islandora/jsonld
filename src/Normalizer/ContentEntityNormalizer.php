@@ -2,7 +2,7 @@
 
 namespace Drupal\jsonld\Normalizer;
 
-use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -61,27 +61,45 @@ class ContentEntityNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function normalize($entity, $format = NULL, array $context = array()) {
-    //Jared, here we have access to the entity itself, the encoder basically deals with
-    // data array already built here
+    // We need to make sure that this only runs for JSON-LD.
+    // @TODO check $format before going RDF crazy
+    $normalized = [];
+
+
     $context += array(
       'account' => NULL,
       'included_fields' => NULL,
+      'needs_jsonldcontext' => TRUE,
+      'embedded' => FALSE,
     );
-    error_log(var_dump($context,true));
+
+    if ($context['needs_jsonldcontext']) {
+      $normalized['@context'] = rdf_get_namespaces();
+    }
+    // Let's see if this content entity has
+    // rdf mapping associated to the bundle.
+    $rdf_mappings = rdf_get_mapping($entity->getEntityTypeId(), $entity->bundle());
+    $bundle_rdf_mappings = $rdf_mappings->getPreparedBundleMapping($entity->getEntityTypeId(), $entity->bundle());
+
+    // In Drupal space, the entity type URL.
+    $drupal_entity_type = $this->linkManager->getTypeUri($entity->getEntityTypeId(), $entity->bundle(), $context);
+
+
     // Create the array of normalized fields, starting with the URI.
     /** @var $entity \Drupal\Core\Entity\ContentEntityInterface */
-    $normalized = array(
-      '_links' => array(
-        'self' => array(
-          'href' => $this->getEntityUri($entity),
-        ),
-        'type' => array(
-          'href' => $this->linkManager->getTypeUri($entity->getEntityTypeId(), $entity->bundle(), $context),
+    $normalized = $normalized + array(
+      '@graph' => array(
+        $this->getEntityUri($entity) => array(
+          '@id' => $this->getEntityUri($entity),
+          '@type' => empty($bundle_rdf_mappings['types']) ? $drupal_entity_type : $bundle_rdf_mappings['types'],
         ),
       ),
     );
 
     // If the fields to use were specified, only output those field values.
+    // We could make use of this context key
+    // To limit json-ld output to an subset
+    // that is just compatible with fcrepo4 and LDP?
     if (isset($context['included_fields'])) {
       $fields = array();
       foreach ($context['included_fields'] as $field_name) {
@@ -91,16 +109,31 @@ class ContentEntityNormalizer extends NormalizerBase {
     else {
       $fields = $entity->getFields();
     }
-    foreach ($fields as $field) {
-      // Continue if the current user does not have access to view this field.
-      if (!$field->access('view', $context['account'])) {
-        continue;
-      }
 
-      $normalized_property = $this->serializer->normalize($field, $format, $context);
-      $normalized = NestedArray::mergeDeep($normalized, $normalized_property);
+    $context['current_entity_id'] = $this->getEntityUri($entity);
+    $context['current_entity_rdf_mapping'] = $rdf_mappings;
+    foreach ($fields as $name => $field) {
+      // Just process fields that have rdf mappings defined.
+      // We could also pass as not contextualized keys the others
+      // if needed.
+      if (!empty($rdf_mappings->getPreparedFieldMapping($name))) {
+        // Continue if the current user does not have access to view this field.
+        if (!$field->access('view', $context['account'])) {
+          continue;
+        }
+        // This tells consecutive calls to content entity normalisers
+        // that @context is not needed again.
+        $normalized_property = $this->serializer->normalize($field, $format, $context);
+        $normalized = array_merge_recursive($normalized, $normalized_property);
+
+        //$normalized = NestedArray::mergeDeep($normalized, $normalized_property);
+      }
     }
-    var_dump($normalized);
+    // Clean up @graph if this is the top-level entity
+    // by converting from associative to numeric indexed.
+    if (!$context['embedded']) {
+      $normalized['@graph'] = array_values($normalized['@graph']);
+    }
     return $normalized;
   }
 
@@ -206,7 +239,7 @@ class ContentEntityNormalizer extends NormalizerBase {
       return $entity->url('canonical', []);
     }
     $url = $entity->urlInfo('canonical', ['absolute' => TRUE]);
-    return $url->setRouteParameter('_format', 'hal_json')->toString();
+    return $url->setRouteParameter('_format', 'jsonld')->toString();
   }
 
   /**

@@ -71,6 +71,10 @@ class FieldItemNormalizer extends NormalizerBase {
       // keyed by field name so that field items can be merged by the
       // FieldNormalizer.
       foreach ($field_keys as $field_name) {
+        // If there's no context, we need full predicates, not shortened ones.
+        if (!$context['needs_jsonldcontext']) {
+          $field_name = $this->escapePrefix($field_name, $context['namespaces']);
+        }
         $normalized[$field_name] = array($values_clean);
       }
 

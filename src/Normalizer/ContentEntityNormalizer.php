@@ -69,12 +69,13 @@ class ContentEntityNormalizer extends NormalizerBase {
     $context += array(
       'account' => NULL,
       'included_fields' => NULL,
-      'needs_jsonldcontext' => TRUE,
+      'needs_jsonldcontext' => FALSE,
       'embedded' => FALSE,
+      'namespaces' => rdf_get_namespaces(),
     );
 
     if ($context['needs_jsonldcontext']) {
-      $normalized['@context'] = rdf_get_namespaces();
+      $normalized['@context'] = $context['namespaces'];
     }
     // Let's see if this content entity has
     // rdf mapping associated to the bundle.
@@ -85,13 +86,25 @@ class ContentEntityNormalizer extends NormalizerBase {
     $drupal_entity_type = $this->linkManager->getTypeUri($entity->getEntityTypeId(), $entity->bundle(), $context);
 
 
+    // Extract rdf:types.
+    $hasTypes = empty($bundle_rdf_mappings['types']);
+    $types = $hasTypes ? $drupal_entity_type : $bundle_rdf_mappings['types'];
+
+    // If there's no context and the types are not drupal entity types, we need full predicates.
+    // Not shortened ones.  So we replace them in place.
+    if ($context['needs_jsonldcontext'] === FALSE && is_array($types)) {
+      for ($i = 0; $i < count($types); $i++) {
+        $types[$i] = $this->escapePrefix($types[$i], $context['namespaces']);
+      }
+    }
+
     // Create the array of normalized fields, starting with the URI.
     /** @var $entity \Drupal\Core\Entity\ContentEntityInterface */
     $normalized = $normalized + array(
       '@graph' => array(
         $this->getEntityUri($entity) => array(
           '@id' => $this->getEntityUri($entity),
-          '@type' => empty($bundle_rdf_mappings['types']) ? $drupal_entity_type : $bundle_rdf_mappings['types'],
+          '@type' => $types,
         ),
       ),
     );

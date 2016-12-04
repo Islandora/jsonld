@@ -103,22 +103,19 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
 
       // The returned structure will be recursively merged into the normalized
       // JSON-LD @Graph
-      $entity = $field_item->getEntity();
-      $field_uri = $this->linkManager->getRelationUri($entity->getEntityTypeId(), $entity->bundle(), $field_name, $context);
       foreach ($field_keys as $field_name) {
+        // If there's no context, we need full predicates, not shortened ones.
+        if (!$context['needs_jsonldcontext']) {
+          $field_name = $this->escapePrefix($field_name, $context['namespaces']);
+        }
         $normalized_prop[$field_name] = array($values_clean);
       }
 
     }
-
-    $normalized_in_context = $embedded;
-    $normalized_in_context = array_merge_recursive($normalized_in_context, array('@graph' => array($context['current_entity_id'] => $normalized_prop)));
-
-
+    
+    $normalized_in_context = array_merge_recursive($embedded, array('@graph' => array($context['current_entity_id'] => $normalized_prop)));
 
     return $normalized_in_context;
-
-
   }
 
   /**

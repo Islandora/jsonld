@@ -42,4 +42,21 @@ abstract class NormalizerBase extends SerializationNormalizerBase implements Den
     return FALSE;
   }
 
+  /**
+   * Escapes namespace prefixes in predicates.
+   *
+   * @param string $predicate  The predicate whose namespace you wish to escape
+   * @param array  $namespaces Associative array of namespaces keyed by prefix
+   *
+   * @return string The predicate with escaped namespace prefix
+   */
+  protected function escapePrefix($predicate, array $namespaces)
+  {
+      $exploded = explode(":", $predicate);
+      if (!isset($namespaces[$exploded[0]])) {
+          return $predicate;
+      }
+      return $namespaces[$exploded[0]] . $exploded[1];
+  }
+
 }

@@ -1,0 +1,13 @@
+{
+    "name": "drupal/claw-jsonld",
+    "description": "JSON-LD serializer for Drupal 8",
+    "type": "drupal-module",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Diego Pino",
+            "email": "dpino@metro.org"
+        }
+    ],
+    "require": {}
+}

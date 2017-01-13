@@ -1,5 +1,5 @@
 {
-    "name": "drupal/claw-jsonld",
+    "name": "islandora/claw-jsonld",
     "description": "JSON-LD serializer for Drupal 8",
     "type": "drupal-module",
     "license": "MIT",

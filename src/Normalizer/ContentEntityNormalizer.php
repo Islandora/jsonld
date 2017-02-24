@@ -2,7 +2,6 @@
 
 namespace Drupal\jsonld\Normalizer;
 
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -42,7 +41,6 @@ class ContentEntityNormalizer extends NormalizerBase {
    */
   protected $moduleHandler;
 
-
   /**
    * Constructs an ContentEntityNormalizer object.
    *
@@ -65,7 +63,6 @@ class ContentEntityNormalizer extends NormalizerBase {
     // @TODO check $format before going RDF crazy
     $normalized = [];
 
-
     $context += array(
       'account' => NULL,
       'included_fields' => NULL,
@@ -80,18 +77,18 @@ class ContentEntityNormalizer extends NormalizerBase {
     // Let's see if this content entity has
     // rdf mapping associated to the bundle.
     $rdf_mappings = rdf_get_mapping($entity->getEntityTypeId(), $entity->bundle());
-    $bundle_rdf_mappings = $rdf_mappings->getPreparedBundleMapping($entity->getEntityTypeId(), $entity->bundle());
+    $bundle_rdf_mappings = $rdf_mappings->getPreparedBundleMapping();
 
     // In Drupal space, the entity type URL.
     $drupal_entity_type = $this->linkManager->getTypeUri($entity->getEntityTypeId(), $entity->bundle(), $context);
-
 
     // Extract rdf:types.
     $hasTypes = empty($bundle_rdf_mappings['types']);
     $types = $hasTypes ? $drupal_entity_type : $bundle_rdf_mappings['types'];
 
-    // If there's no context and the types are not drupal entity types, we need full predicates.
-    // Not shortened ones.  So we replace them in place.
+    // If there's no context and the types are not drupal
+    // entity types, we need full predicates,
+    // not shortened ones. So we replace them in place.
     if ($context['needs_jsonldcontext'] === FALSE && is_array($types)) {
       for ($i = 0; $i < count($types); $i++) {
         $types[$i] = $this->escapePrefix($types[$i], $context['namespaces']);
@@ -99,7 +96,7 @@ class ContentEntityNormalizer extends NormalizerBase {
     }
 
     // Create the array of normalized fields, starting with the URI.
-    /** @var $entity \Drupal\Core\Entity\ContentEntityInterface */
+    /* @var $entity \Drupal\Core\Entity\ContentEntityInterface */
     $normalized = $normalized + array(
       '@graph' => array(
         $this->getEntityUri($entity) => array(
@@ -137,9 +134,11 @@ class ContentEntityNormalizer extends NormalizerBase {
         // This tells consecutive calls to content entity normalisers
         // that @context is not needed again.
         $normalized_property = $this->serializer->normalize($field, $format, $context);
+        // $this->serializer in questions does implement normalize
+        // but the interface (typehint) does not.
+        // We could check if serializer implements normalizer interface
+        // to avoid any possible errors in case someone swaps serializer.
         $normalized = array_merge_recursive($normalized, $normalized_property);
-
-        //$normalized = NestedArray::mergeDeep($normalized, $normalized_property);
       }
     }
     // Clean up @graph if this is the top-level entity
@@ -151,24 +150,7 @@ class ContentEntityNormalizer extends NormalizerBase {
   }
 
   /**
-   * Implements \Symfony\Component\Serializer\Normalizer\DenormalizerInterface::denormalize().
-   *
-   * @param array $data
-   *   Entity data to restore.
-   * @param string $class
-   *   Unused, entity_create() is used to instantiate entity objects.
-   * @param string $format
-   *   Format the given data was extracted from.
-   * @param array $context
-   *   Options available to the denormalizer. Keys that can be used:
-   *   - request_method: if set to "patch" the denormalization will clear out
-   *     all default values for entity fields before applying $data to the
-   *     entity.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   *   An unserialized entity object containing the data in $data.
-   *
-   * @throws \Symfony\Component\Serializer\Exception\UnexpectedValueException
+   * {@inheritdoc}
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
     // Get type, necessary for determining which bundle to create.
@@ -240,8 +222,9 @@ class ContentEntityNormalizer extends NormalizerBase {
   /**
    * Constructs the entity URI.
    *
-   * @param \Drupal\Core\Entity\EntityInterface
+   * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
+   *
    * @return string
    *   The entity URI.
    */
@@ -266,7 +249,7 @@ class ContentEntityNormalizer extends NormalizerBase {
    * @return array
    *   The typed data IDs.
    */
-  protected function getTypedDataIds($types, $context = array()) {
+  protected function getTypedDataIds(array $types, array $context = array()) {
     // The 'type' can potentially contain an array of type objects. By default,
     // Drupal only uses a single type in serializing, but allows for multiple
     // types when deserializing.

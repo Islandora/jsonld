@@ -2,7 +2,6 @@
 
 namespace Drupal\jsonld\Normalizer;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\rest\LinkManager\LinkManagerInterface;
 use Drupal\serialization\EntityResolver\EntityResolverInterface;
@@ -51,7 +50,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
    * {@inheritdoc}
    */
   public function normalize($field_item, $format = NULL, array $context = array()) {
-    /** @var $field_item \Drupal\Core\Field\FieldItemInterface */
+    /* @var $field_item \Drupal\Core\Field\FieldItemInterface */
     $target_entity = $field_item->get('entity')->getValue();
     $normalized_prop = array();
     // If this is not a content entity, let the parent implementation handle it,
@@ -74,8 +73,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
     // This will call \Drupal\jsonld\Normalizer\ContentEntityNormalizer.
     $embedded = $this->serializer->normalize($target_entity, $format, $context);
 
-
-   if (isset($context['current_entity_rdf_mapping'])) {
+    if (isset($context['current_entity_rdf_mapping'])) {
       // So why i am passing the whole rdf mapping object and not
       // only the predicate? Well because i hope i will be able
       // to MAP to RDF also sub fields of a complex field someday
@@ -112,7 +110,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
       }
 
     }
-    
+
     $normalized_in_context = array_merge_recursive($embedded, array('@graph' => array($context['current_entity_id'] => $normalized_prop)));
 
     return $normalized_in_context;

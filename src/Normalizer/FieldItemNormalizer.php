@@ -112,15 +112,15 @@ class FieldItemNormalizer extends NormalizerBase {
   /**
    * Build the field item value using the incoming data.
    *
-   * @param $data
+   * @param array $data
    *   The incoming data for this field item.
-   * @param $context
+   * @param array $context
    *   The context passed into the Normalizer.
    *
    * @return mixed
    *   The value to use in Entity::setValue().
    */
-  protected function constructValue($data, $context) {
+  protected function constructValue(array $data, array $context) {
     return $data;
   }
 
@@ -132,9 +132,9 @@ class FieldItemNormalizer extends NormalizerBase {
    * entity. This is the reason for using target_instances, from which the
    * property path can be traversed up to the root.
    *
-   * @param \Drupal\Core\Field\FieldItemInterface $field_item
+   * @param \Drupal\Core\Field\FieldItemInterface $item
    *   The untranslated field item instance.
-   * @param $langcode
+   * @param string $langcode
    *   The langcode.
    *
    * @return \Drupal\Core\Field\FieldItemInterface

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Adds support for serializing entities to JSON-LD / LDP for the islandora CLAW Project.
+ * Adds support for serializing entities to JSON-LD / Islandora CLAW Project.
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;

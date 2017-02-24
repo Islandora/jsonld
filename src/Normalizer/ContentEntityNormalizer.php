@@ -150,26 +150,9 @@ class ContentEntityNormalizer extends NormalizerBase {
   }
 
   /**
-   * Implements \Symfony\Component\Serializer\Normalizer\DenormalizerInterface::denormalize().
-   *
-   * @param array $data
-   *   Entity data to restore.
-   * @param string $class
-   *   Unused, entity_create() is used to instantiate entity objects.
-   * @param string $format
-   *   Format the given data was extracted from.
-   * @param array $context
-   *   Options available to the denormalizer. Keys that can be used:
-   *   - request_method: if set to "patch" the denormalization will clear out
-   *     all default values for entity fields before applying $data to the
-   *     entity.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   *   An unserialized entity object containing the data in $data.
-   *
-   * @throws \Symfony\Component\Serializer\Exception\UnexpectedValueException
+   * {@inheritdoc}
    */
-  public function denormalize(array $data, string $class, string $format = NULL, array $context = array()) {
+  public function denormalize($data, $class, $format = NULL, array $context = array()) {
     // Get type, necessary for determining which bundle to create.
     if (!isset($data['_links']['type'])) {
       throw new UnexpectedValueException('The type link relation must be specified.');

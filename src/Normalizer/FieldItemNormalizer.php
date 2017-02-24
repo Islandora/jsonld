@@ -140,7 +140,7 @@ class FieldItemNormalizer extends NormalizerBase {
    * @return \Drupal\Core\Field\FieldItemInterface
    *   The translated field item instance.
    */
-  protected function createTranslatedInstance(FieldItemInterface $item, string $langcode) {
+  protected function createTranslatedInstance(FieldItemInterface $item, $langcode) {
     // Remove the untranslated item that was created for the default language
     // by FieldNormalizer::denormalize().
     $items = $item->getParent();

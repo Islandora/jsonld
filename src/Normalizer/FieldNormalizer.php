@@ -96,7 +96,7 @@ class FieldNormalizer extends NormalizerBase {
    * @return array
    *   The array of normalized field items.
    */
-  protected function normalizeFieldItems(FieldItemListInterface $field, string $format, array $context) {
+  protected function normalizeFieldItems(FieldItemListInterface $field, $format, array $context) {
     $normalized_field_items = array();
     if (!$field->isEmpty()) {
       foreach ($field as $field_item) {

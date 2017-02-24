@@ -119,7 +119,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
   /**
    * {@inheritdoc}
    */
-  protected function constructValue($data, $context) {
+  protected function constructValue(array $data, array $context) {
     $field_item = $context['target_instance'];
     $field_definition = $field_item->getFieldDefinition();
     $target_type = $field_definition->getSetting('target_type');

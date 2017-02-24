@@ -1,38 +1,32 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: dpino
- * Date: 9/1/16
- * Time: 9:33 PM
- */
 
 namespace Drupal\jsonld\Normalizer;
 
-  /**
+/**
    * JSON-LD context helper trait.
    *
    * @author Diego Pino Navarro
    *
    * @internal
    */
-trait JsonLdContextTrait
-{
+trait JsonLdContextTrait {
+
   /**
    * Adds @context key to a normalized JSON-LD structure.
    *
-   * @param ContextBuilderInterface $contextBuilder
-   * @param string                  $
-   * @param array                   $context
-   * @param array                   $data
+   * @param array $context
+   *   Context (iteration) this runs.
+   * @param array $data
+   *   A JSON-LD @context data structure.
    *
    * @return array
+   *   A JSON-LD @context data structure.
    */
-  private function addJsonLdContext(array &$context, array $data = [])
-  {
+  private function addJsonLdContext(array &$context, array $data = []) {
     if (isset($context['has_context'])) {
       return $data;
     }
-    $context['has_context'] = true;
+    $context['has_context'] = TRUE;
     if (isset($context['embed_context'])) {
       $data['@context'] = "";
       return $data;
@@ -40,6 +34,5 @@ trait JsonLdContextTrait
     $data['@context'] = "";
     return $data;
   }
-}
 
 }

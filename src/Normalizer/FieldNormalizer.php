@@ -3,6 +3,7 @@
 namespace Drupal\jsonld\Normalizer;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Field\FieldItemListInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**

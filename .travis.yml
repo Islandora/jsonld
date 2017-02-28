@@ -21,8 +21,9 @@ before_install:
 install:
   - git clone https://github.com/Islandora-CLAW/islandora.git $HOME/islandora
   - $SCRIPT_DIR/travis_setup.sh
+  - git -C "$TRAVIS_BUILD_DIR" checkout -b travis-testing
   - cd $DRUPAL_DIR; composer config repositories.local path "$TRAVIS_BUILD_DIR"
-  - composer require "islandora/claw-jsonld:dev-$TRAVIS_COMMIT as dev-8.x-1.x" --prefer-source
+  - composer require "islandora/claw-jsonld:dev-travis-testing as dev-8.x-1.x" --prefer-source
   - cd web; drush en -y jsonld
 
 script:

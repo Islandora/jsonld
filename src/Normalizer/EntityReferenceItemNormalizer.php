@@ -42,6 +42,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
    *   The entity resolver.
    */
   public function __construct(LinkManagerInterface $link_manager, EntityResolverInterface $entity_Resolver) {
+
     $this->linkManager = $link_manager;
     $this->entityResolver = $entity_Resolver;
   }
@@ -50,6 +51,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
    * {@inheritdoc}
    */
   public function normalize($field_item, $format = NULL, array $context = array()) {
+
     /* @var $field_item \Drupal\Core\Field\FieldItemInterface */
     $target_entity = $field_item->get('entity')->getValue();
     $normalized_prop = array();
@@ -78,11 +80,13 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
       // only the predicate? Well because i hope i will be able
       // to MAP to RDF also sub fields of a complex field someday
       // and somehow.
-      $field_mappings = $context['current_entity_rdf_mapping']->getPreparedFieldMapping($field_item->getParent()
-        ->getName());
+      $field_mappings = $context['current_entity_rdf_mapping']->getPreparedFieldMapping(
+        $field_item->getParent()
+          ->getName()
+      );
       $field_keys = isset($field_mappings['properties']) ?
-        $field_mappings['properties'] :
-        [$field_item->getParent()->getName()];
+            $field_mappings['properties'] :
+            [$field_item->getParent()->getName()];
       if (!empty($field_mappings['datatype'])) {
         $values_clean['@type'] = $field_mappings['datatype'];
       }
@@ -120,6 +124,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
    * {@inheritdoc}
    */
   protected function constructValue(array $data, array $context) {
+
     $field_item = $context['target_instance'];
     $field_definition = $field_item->getFieldDefinition();
     $target_type = $field_definition->getSetting('target_type');
@@ -134,6 +139,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
    * {@inheritdoc}
    */
   public function getUuid($data) {
+
     if (isset($data['uuid'])) {
       $uuid = $data['uuid'];
       // The value may be a nested array like $uuid[0]['value'].

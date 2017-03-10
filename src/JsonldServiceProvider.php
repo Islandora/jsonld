@@ -14,8 +14,11 @@ class JsonldServiceProvider implements ServiceModifierInterface {
    * {@inheritdoc}
    */
   public function alter(ContainerBuilder $container) {
-    if ($container->has('http_middleware.negotiation') && is_a($container->getDefinition('http_middleware.negotiation')
-      ->getClass(), '\Drupal\Core\StackMiddleware\NegotiationMiddleware', TRUE)
+
+    if ($container->has('http_middleware.negotiation') && is_a(
+        $container->getDefinition('http_middleware.negotiation')
+          ->getClass(), '\Drupal\Core\StackMiddleware\NegotiationMiddleware', TRUE
+    )
     ) {
       $container->getDefinition('http_middleware.negotiation')
         ->addMethodCall('registerFormat', ['jsonld', ['application/ld+json']]);

@@ -22,6 +22,7 @@ class FieldNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function normalize($field, $format = NULL, array $context = array()) {
+
     $normalized_field_items = array();
 
     // Get the field definition.
@@ -62,6 +63,7 @@ class FieldNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
+
     if (!isset($context['target_instance'])) {
       throw new InvalidArgumentException('$context[\'target_instance\'] must be set to denormalize with the FieldNormalizer');
     }
@@ -98,6 +100,7 @@ class FieldNormalizer extends NormalizerBase {
    *   The array of normalized field items.
    */
   protected function normalizeFieldItems(FieldItemListInterface $field, $format, array $context) {
+
     $normalized_field_items = array();
     if (!$field->isEmpty()) {
       foreach ($field as $field_item) {

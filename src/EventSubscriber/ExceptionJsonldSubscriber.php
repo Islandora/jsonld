@@ -13,6 +13,7 @@ class ExceptionJsonldSubscriber extends ExceptionJsonSubscriber {
    * {@inheritdoc}
    */
   protected function getHandledFormats() {
+
     return ['jsonld'];
   }
 

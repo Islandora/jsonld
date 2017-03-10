@@ -86,6 +86,7 @@ class FieldItemNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
+
     if (!isset($context['target_instance'])) {
       throw new InvalidArgumentException('$context[\'target_instance\'] must be set to denormalize with the FieldItemNormalizer');
     }
@@ -121,6 +122,7 @@ class FieldItemNormalizer extends NormalizerBase {
    *   The value to use in Entity::setValue().
    */
   protected function constructValue(array $data, array $context) {
+
     return $data;
   }
 
@@ -141,6 +143,7 @@ class FieldItemNormalizer extends NormalizerBase {
    *   The translated field item instance.
    */
   protected function createTranslatedInstance(FieldItemInterface $item, $langcode) {
+
     // Remove the untranslated item that was created for the default language
     // by FieldNormalizer::denormalize().
     $items = $item->getParent();

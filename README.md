@@ -5,7 +5,7 @@
 
 ## Introduction
 
-JSON-LD Serializer for Drupal 8 And Islandora CLAW
+JSON-LD Serializer for Drupal 8 and Islandora CLAW
 
 This module adds a simple Drupal entity to JSON-LD 
 `normalizer/serializer/unserializer` service provider and a few supporting 

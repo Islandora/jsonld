@@ -46,10 +46,13 @@ class ContentEntityNormalizer extends NormalizerBase {
    *
    * @param \Drupal\rest\LinkManager\LinkManagerInterface $link_manager
    *   The hypermedia link manager.
-   *
-   * @TODO add all params corresponding to dependency injection
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
    */
   public function __construct(LinkManagerInterface $link_manager, EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler) {
+
     $this->linkManager = $link_manager;
     $this->entityManager = $entity_manager;
     $this->moduleHandler = $module_handler;
@@ -59,6 +62,7 @@ class ContentEntityNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function normalize($entity, $format = NULL, array $context = array()) {
+
     // We need to make sure that this only runs for JSON-LD.
     // @TODO check $format before going RDF crazy
     $normalized = [];
@@ -153,6 +157,7 @@ class ContentEntityNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
+
     // Get type, necessary for determining which bundle to create.
     if (!isset($data['_links']['type'])) {
       throw new UnexpectedValueException('The type link relation must be specified.');
@@ -229,6 +234,7 @@ class ContentEntityNormalizer extends NormalizerBase {
    *   The entity URI.
    */
   protected function getEntityUri(EntityInterface $entity) {
+
     // Some entity types don't provide a canonical link template, at least call
     // out to ->url().
     if ($entity->isNew() || !$entity->hasLinkTemplate('canonical')) {
@@ -250,6 +256,7 @@ class ContentEntityNormalizer extends NormalizerBase {
    *   The typed data IDs.
    */
   protected function getTypedDataIds(array $types, array $context = array()) {
+
     // The 'type' can potentially contain an array of type objects. By default,
     // Drupal only uses a single type in serializing, but allows for multiple
     // types when deserializing.

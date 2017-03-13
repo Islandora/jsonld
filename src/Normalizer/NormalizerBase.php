@@ -21,6 +21,7 @@ abstract class NormalizerBase extends SerializationNormalizerBase implements Den
    * {@inheritdoc}
    */
   public function supportsNormalization($data, $format = NULL) {
+
     return in_array($format, $this->formats) && parent::supportsNormalization($data, $format);
   }
 
@@ -28,6 +29,7 @@ abstract class NormalizerBase extends SerializationNormalizerBase implements Den
    * {@inheritdoc}
    */
   public function supportsDenormalization($data, $type, $format = NULL) {
+
     if (in_array($format, $this->formats) && (class_exists($this->supportedInterfaceOrClass) || interface_exists($this->supportedInterfaceOrClass))) {
       $target = new \ReflectionClass($type);
       $supported = new \ReflectionClass($this->supportedInterfaceOrClass);
@@ -54,6 +56,7 @@ abstract class NormalizerBase extends SerializationNormalizerBase implements Den
    *   The predicate with escaped namespace prefix.
    */
   protected function escapePrefix($predicate, array $namespaces) {
+
     $exploded = explode(":", $predicate);
     if (!isset($namespaces[$exploded[0]])) {
       return $predicate;

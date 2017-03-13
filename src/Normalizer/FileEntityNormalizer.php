@@ -39,6 +39,7 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
    *   The module handler.
    */
   public function __construct(EntityManagerInterface $entity_manager, ClientInterface $http_client, LinkManagerInterface $link_manager, ModuleHandlerInterface $module_handler) {
+
     parent::__construct($link_manager, $entity_manager, $module_handler);
 
     $this->httpClient = $http_client;
@@ -48,6 +49,7 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
    * {@inheritdoc}
    */
   public function normalize($entity, $format = NULL, array $context = array()) {
+
     $data = parent::normalize($entity, $format, $context);
     // Replace the file url with a full url for the file.
     $data['uri'][0]['value'] = $this->getEntityUri($entity);
@@ -59,6 +61,7 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
    * {@inheritdoc}
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
+
     $file_data = (string) $this->httpClient->get($data['uri'][0]['value'])->getBody();
 
     $path = 'temporary://' . drupal_basename($data['uri'][0]['value']);

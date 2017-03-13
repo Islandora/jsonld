@@ -22,16 +22,6 @@ class JsonldEncoder extends SymfonyJsonEncoder {
   /**
    * {@inheritdoc}
    */
-  public function encode($data, $format, array $context = array()) {
-
-    // Basically nothing to do here right now, since normalization
-    // does the heavy work and JSON-LD is json encoded.
-    return parent::encode($data, $format, $context);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function supportsEncoding($format) {
 
     return $format == $this->format;

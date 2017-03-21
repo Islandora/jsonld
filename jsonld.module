@@ -16,7 +16,7 @@ function jsonld_help($route_name, RouteMatchInterface $route_match) {
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
       $output .= t('<p><a href=":jsonld_spec">JSON-LD</a>, or JavaScript Object Notation for Linked Data, is
-        a method of encoding Linked Data using JSON.</p>', array(':jsonld_spec' => 'http://json-ld.org/spec/latest/json-ld-syntax/'));
+        a method of encoding Linked Data using JSON.</p>', [':jsonld_spec' => 'http://json-ld.org/spec/latest/json-ld-syntax/']);
       $output .= '<p>It was a goal to require as little effort as possible from 
         developers to transform their existing JSON to JSON-LD.</p>';
       $output .= '<p>This allows data to be serialized in a way that is similar 

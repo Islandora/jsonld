@@ -20,7 +20,7 @@ class FieldItemNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function normalize($field_item, $format = NULL, array $context = array()) {
+  public function normalize($field_item, $format = NULL, array $context = []) {
 
     // @TODO Understand Drupal complex fields to RDF mapping
     // Fields can be complex, with multiple subfields
@@ -29,8 +29,8 @@ class FieldItemNormalizer extends NormalizerBase {
     $values = $field_item->toArray();
     // For now we will just pass @value and @language to json-ld
     // Until we find a way of mapping to rdf subfields.
-    $values_clean = array();
-    $normalized = array();
+    $values_clean = [];
+    $normalized = [];
     $field = $field_item->getParent();
     if (!isset($values['value'])) {
       // Makes little sense to add to json-ld without a value.
@@ -44,7 +44,7 @@ class FieldItemNormalizer extends NormalizerBase {
         // to MAP to RDF also sub fields of a complex field someday
         // and somehow.
         $field_mappings = $context['current_entity_rdf_mapping']->getPreparedFieldMapping($field->getName());
-        $field_keys = isset($field_mappings['properties']) ? $field_mappings['properties'] : array($field->getName());
+        $field_keys = isset($field_mappings['properties']) ? $field_mappings['properties'] : [$field->getName()];
         if (!empty($field_mappings['datatype'])) {
           $values_clean['@type'] = $field_mappings['datatype'];
         }
@@ -60,7 +60,7 @@ class FieldItemNormalizer extends NormalizerBase {
         }
       }
       else {
-        $field_keys = array($field->getName());
+        $field_keys = [$field->getName()];
       }
 
       if (isset($context['langcode'])) {
@@ -75,7 +75,7 @@ class FieldItemNormalizer extends NormalizerBase {
         if (!$context['needs_jsonldcontext']) {
           $field_name = $this->escapePrefix($field_name, $context['namespaces']);
         }
-        $normalized[$field_name] = array($values_clean);
+        $normalized[$field_name] = [$values_clean];
       }
 
       return $normalized;
@@ -85,7 +85,7 @@ class FieldItemNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = array()) {
+  public function denormalize($data, $class, $format = NULL, array $context = []) {
 
     if (!isset($context['target_instance'])) {
       throw new InvalidArgumentException('$context[\'target_instance\'] must be set to denormalize with the FieldItemNormalizer');

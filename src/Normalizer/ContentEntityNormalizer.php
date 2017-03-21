@@ -61,19 +61,19 @@ class ContentEntityNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function normalize($entity, $format = NULL, array $context = array()) {
+  public function normalize($entity, $format = NULL, array $context = []) {
 
     // We need to make sure that this only runs for JSON-LD.
     // @TODO check $format before going RDF crazy
     $normalized = [];
 
-    $context += array(
+    $context += [
       'account' => NULL,
       'included_fields' => NULL,
       'needs_jsonldcontext' => FALSE,
       'embedded' => FALSE,
       'namespaces' => rdf_get_namespaces(),
-    );
+    ];
 
     if ($context['needs_jsonldcontext']) {
       $normalized['@context'] = $context['namespaces'];
@@ -101,21 +101,21 @@ class ContentEntityNormalizer extends NormalizerBase {
 
     // Create the array of normalized fields, starting with the URI.
     /* @var $entity \Drupal\Core\Entity\ContentEntityInterface */
-    $normalized = $normalized + array(
-      '@graph' => array(
-        $this->getEntityUri($entity) => array(
+    $normalized = $normalized + [
+      '@graph' => [
+        $this->getEntityUri($entity) => [
           '@id' => $this->getEntityUri($entity),
           '@type' => $types,
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
     // If the fields to use were specified, only output those field values.
     // We could make use of this context key
     // To limit json-ld output to an subset
     // that is just compatible with fcrepo4 and LDP?
     if (isset($context['included_fields'])) {
-      $fields = array();
+      $fields = [];
       foreach ($context['included_fields'] as $field_name) {
         $fields[] = $entity->get($field_name);
       }
@@ -156,7 +156,7 @@ class ContentEntityNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = array()) {
+  public function denormalize($data, $class, $format = NULL, array $context = []) {
 
     // Get type, necessary for determining which bundle to create.
     if (!isset($data['_links']['type'])) {
@@ -167,7 +167,7 @@ class ContentEntityNormalizer extends NormalizerBase {
     $typed_data_ids = $this->getTypedDataIds($data['_links']['type'], $context);
     $entity_type = $this->entityManager->getDefinition($typed_data_ids['entity_type']);
     $langcode_key = $entity_type->getKey('langcode');
-    $values = array();
+    $values = [];
 
     // Figure out the language to use.
     if (isset($data[$langcode_key])) {
@@ -188,7 +188,7 @@ class ContentEntityNormalizer extends NormalizerBase {
     // Remove links from data array.
     unset($data['_links']);
     // Get embedded resources and remove from data array.
-    $embedded = array();
+    $embedded = [];
     if (isset($data['_embedded'])) {
       $embedded = $data['_embedded'];
       unset($data['_embedded']);
@@ -213,7 +213,7 @@ class ContentEntityNormalizer extends NormalizerBase {
       // Remove any values that were set as a part of entity creation (e.g
       // uuid). If the incoming field data is set to an empty array, this will
       // also have the effect of emptying the field in REST module.
-      $items->setValue(array());
+      $items->setValue([]);
       if ($field_data) {
         // Denormalize the field data into the FieldItemList object.
         $context['target_instance'] = $items;
@@ -255,13 +255,13 @@ class ContentEntityNormalizer extends NormalizerBase {
    * @return array
    *   The typed data IDs.
    */
-  protected function getTypedDataIds(array $types, array $context = array()) {
+  protected function getTypedDataIds(array $types, array $context = []) {
 
     // The 'type' can potentially contain an array of type objects. By default,
     // Drupal only uses a single type in serializing, but allows for multiple
     // types when deserializing.
     if (isset($types['href'])) {
-      $types = array($types);
+      $types = [$types];
     }
 
     foreach ($types as $type) {

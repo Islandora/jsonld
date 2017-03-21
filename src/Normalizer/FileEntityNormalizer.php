@@ -48,7 +48,7 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
   /**
    * {@inheritdoc}
    */
-  public function normalize($entity, $format = NULL, array $context = array()) {
+  public function normalize($entity, $format = NULL, array $context = []) {
 
     $data = parent::normalize($entity, $format, $context);
     // Replace the file url with a full url for the file.
@@ -60,7 +60,7 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = array()) {
+  public function denormalize($data, $class, $format = NULL, array $context = []) {
 
     $file_data = (string) $this->httpClient->get($data['uri'][0]['value'])->getBody();
 

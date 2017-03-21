@@ -104,7 +104,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
       $values_clean['@id'] = key($embedded['@graph']);
 
       // The returned structure will be recursively merged into the normalized
-      // JSON-LD @Graph
+      // JSON-LD @Graph.
       foreach ($field_keys as $field_name) {
         // If there's no context, we need full predicates, not shortened ones.
         if (!$context['needs_jsonldcontext']) {

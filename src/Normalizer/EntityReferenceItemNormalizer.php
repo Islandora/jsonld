@@ -50,11 +50,11 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
   /**
    * {@inheritdoc}
    */
-  public function normalize($field_item, $format = NULL, array $context = array()) {
+  public function normalize($field_item, $format = NULL, array $context = []) {
 
     /* @var $field_item \Drupal\Core\Field\FieldItemInterface */
     $target_entity = $field_item->get('entity')->getValue();
-    $normalized_prop = array();
+    $normalized_prop = [];
     // If this is not a content entity, let the parent implementation handle it,
     // only content entities are supported as embedded resources.
     if (!($target_entity instanceof FieldableEntityInterface)) {
@@ -68,7 +68,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
     // Limiting to uuid makes sure that we only get one child from base entity
     // if not we could end traversing forever since there is no way
     // we can enforce acyclic entity references.
-    $context['included_fields'] = array('uuid');
+    $context['included_fields'] = ['uuid'];
     $context['needs_jsonldcontext'] = FALSE;
     $context['embedded'] = TRUE;
     // Normalize the target entity.
@@ -110,12 +110,12 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
         if (!$context['needs_jsonldcontext']) {
           $field_name = $this->escapePrefix($field_name, $context['namespaces']);
         }
-        $normalized_prop[$field_name] = array($values_clean);
+        $normalized_prop[$field_name] = [$values_clean];
       }
 
     }
 
-    $normalized_in_context = array_merge_recursive($embedded, array('@graph' => array($context['current_entity_id'] => $normalized_prop)));
+    $normalized_in_context = array_merge_recursive($embedded, ['@graph' => [$context['current_entity_id'] => $normalized_prop]]);
 
     return $normalized_in_context;
   }
@@ -130,7 +130,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
     $target_type = $field_definition->getSetting('target_type');
     $id = $this->entityResolver->resolve($this, $data, $target_type);
     if (isset($id)) {
-      return array('target_id' => $id);
+      return ['target_id' => $id];
     }
     return NULL;
   }

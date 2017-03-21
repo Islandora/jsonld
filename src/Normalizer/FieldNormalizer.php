@@ -21,9 +21,9 @@ class FieldNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function normalize($field, $format = NULL, array $context = array()) {
+  public function normalize($field, $format = NULL, array $context = []) {
 
-    $normalized_field_items = array();
+    $normalized_field_items = [];
 
     // Get the field definition.
     $entity = $field->getEntity();
@@ -62,7 +62,7 @@ class FieldNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = array()) {
+  public function denormalize($data, $class, $format = NULL, array $context = []) {
 
     if (!isset($context['target_instance'])) {
       throw new InvalidArgumentException('$context[\'target_instance\'] must be set to denormalize with the FieldNormalizer');
@@ -101,7 +101,7 @@ class FieldNormalizer extends NormalizerBase {
    */
   protected function normalizeFieldItems(FieldItemListInterface $field, $format, array $context) {
 
-    $normalized_field_items = array();
+    $normalized_field_items = [];
     if (!$field->isEmpty()) {
       foreach ($field as $field_item) {
         $normalized_field_items[] = $this->serializer->normalize($field_item, $format, $context);

@@ -2,7 +2,7 @@
     "name": "islandora/claw-jsonld",
     "description": "JSON-LD serializer for Drupal 8",
     "type": "drupal-module",
-    "license": "MIT",
+    "license": "GPL-2.0+",
     "homepage": "https://github.com/islandora-claw/claw-jsonld",
     "support": {
         "issues": "https://github.com/islandora-claw/CLAW/issues",

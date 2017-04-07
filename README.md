@@ -1,11 +1,11 @@
-# claw-jsonld
-[![Build Status][1]](https://travis-ci.org/Islandora-CLAW/islandora)
+# JSONLD
+[![Build Status][1]](https://travis-ci.org/Islandora-CLAW/jsonld)
 [![Contribution Guidelines][2]](./CONTRIBUTING.md)
 [![LICENSE][3]](./LICENSE)
 
 ## Introduction
 
-JSON-LD Serializer for Drupal 8 and Islandora CLAW
+JSON-LD Serializer for Drupal 8 and Islandora CLAW.
 
 This module adds a simple Drupal entity to JSON-LD 
 `normalizer/serializer/unserializer` service provider and a few supporting 
@@ -32,7 +32,7 @@ an Islandora Foundation [Contributor License Agreement][6] or
 
 [GPLv2](http://www.gnu.org/licenses/gpl-2.0.txt)
 
-[1]: https://travis-ci.org/Islandora-CLAW/claw-jsonld.png?branch=8.x-1.x
+[1]: https://travis-ci.org/Islandora-CLAW/jsonld.png?branch=8.x-1.x
 [2]: http://img.shields.io/badge/CONTRIBUTING-Guidelines-blue.svg
 [3]: https://img.shields.io/badge/license-GPLv2-blue.svg?style=flat-square
 [4]: https://github.com/diegopino

@@ -10,7 +10,7 @@ use Drupal\Tests\jsonld\Kernel\JsonldKernelTestBase;
  *
  * @group jsonld
  */
-class NormalizerTests extends JsonldKernelTestBase {
+class ContentEntityNormalizerTests extends JsonldKernelTestBase {
 
   /**
    * {@inheritdoc}
@@ -22,11 +22,23 @@ class NormalizerTests extends JsonldKernelTestBase {
   }
 
   /**
+   * @covers \Drupal\jsonld\Normalizer\NormalizerBase::supportsNormalization
+   * @covers \Drupal\jsonld\Normalizer\NormalizerBase::escapePrefix
    * @covers \Drupal\jsonld\Normalizer\ContentEntityNormalizer::normalize
+   * @covers \Drupal\jsonld\Normalizer\ContentEntityNormalizer::getEntityUri
    * @covers \Drupal\jsonld\Normalizer\FieldNormalizer::normalize
+   * @covers \Drupal\jsonld\Normalizer\FieldNormalizer::normalizeFieldItems
    * @covers \Drupal\jsonld\Normalizer\FieldItemNormalizer::normalize
+   * @covers \Drupal\jsonld\Normalizer\EntityReferenceItemNormalizer::normalize
    */
   public function testSimpleNormalizeJsonld() {
+    $target_entity = EntityTest::create([
+      'name' => $this->randomMachineName(),
+      'langcode' => 'en',
+      'field_test_entity_reference' => NULL,
+    ]);
+    $target_entity->save();
+
     $tz = new \DateTimeZone('UTC');
     $dt = new \DateTime(NULL, $tz);
     $created = $dt->format("U");
@@ -43,6 +55,9 @@ class NormalizerTests extends JsonldKernelTestBase {
       'field_test_text' => [
         'value' => $this->randomMachineName(),
         'format' => 'full_html',
+      ],
+      'field_test_entity_reference' => [
+        'target_id' => $target_entity->id(),
       ],
     ];
 
@@ -74,6 +89,16 @@ class NormalizerTests extends JsonldKernelTestBase {
               '@type' => 'xsd:string',
             ],
           ],
+          'http://purl.org/dc/terms/references' => [
+            [
+              '@id' => $this->getEntityUri($target_entity),
+              '@type' => 'xsd:nonNegativeInteger',
+            ],
+          ],
+        ],
+        [
+          '@id' => $this->getEntityUri($target_entity),
+          '@type' => ['http://schema.org/Thing'],
         ],
       ],
     ];

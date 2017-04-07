@@ -111,6 +111,9 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
       ->setFieldMapping('field_test_text', [
         'properties' => ['dc:abstract'],
         'datatype' => 'xsd:string',
+      ])->setFieldMapping('field_test_entity_reference', [
+        'properties' => ['dc:references'],
+        'datatype' => 'xsd:nonNegativeInteger',
       ])
       ->save();
 

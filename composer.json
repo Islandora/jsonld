@@ -1,9 +1,9 @@
 {
-    "name": "islandora/claw-jsonld",
+    "name": "islandora/jsonld",
     "description": "JSON-LD serializer for Drupal 8",
     "type": "drupal-module",
     "license": "GPL-2.0+",
-    "homepage": "https://github.com/islandora-claw/claw-jsonld",
+    "homepage": "https://github.com/islandora-claw/jsonld",
     "support": {
         "issues": "https://github.com/islandora-claw/CLAW/issues",
         "irc": "irc://irc.freenode.net/islandora"

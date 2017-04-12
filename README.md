@@ -1,4 +1,4 @@
-# JSONLD
+# ![CLAW-JSON-LD](https://cloud.githubusercontent.com/assets/2371345/24964530/f054bddc-1f77-11e7-8b54-d04bb7b2281c.png) JSONLD
 [![Build Status][1]](https://travis-ci.org/Islandora-CLAW/jsonld)
 [![Contribution Guidelines][2]](./CONTRIBUTING.md)
 [![LICENSE][3]](./LICENSE)

@@ -4,6 +4,6 @@ description: 'Serializes entities to JSON-LD / LDP for the islandora CLAW Projec
 package: Web services
 core: 8.x
 dependencies:
-  - rest
+  - hal
   - serialization
   - rdf

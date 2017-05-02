@@ -12,9 +12,9 @@ use Drupal\jsonld\Normalizer\EntityReferenceItemNormalizer;
 use Drupal\jsonld\Normalizer\FieldItemNormalizer;
 use Drupal\jsonld\Normalizer\FieldNormalizer;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\rest\LinkManager\LinkManager;
-use Drupal\rest\LinkManager\RelationLinkManager;
-use Drupal\rest\LinkManager\TypeLinkManager;
+use Drupal\hal\LinkManager\LinkManager;
+use Drupal\hal\LinkManager\RelationLinkManager;
+use Drupal\hal\LinkManager\TypeLinkManager;
 use Drupal\serialization\EntityResolver\ChainEntityResolver;
 use Drupal\serialization\EntityResolver\TargetIdResolver;
 use Drupal\serialization\EntityResolver\UuidResolver;
@@ -33,7 +33,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
     'user',
     'field',
     'filter',
-    'rest',
+    'hal',
     'serialization',
     'rdf',
     'rdf_test_namespaces',

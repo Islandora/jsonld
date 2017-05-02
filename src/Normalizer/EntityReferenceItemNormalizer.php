@@ -3,7 +3,7 @@
 namespace Drupal\jsonld\Normalizer;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\rest\LinkManager\LinkManagerInterface;
+use Drupal\hal\LinkManager\LinkManagerInterface;
 use Drupal\serialization\EntityResolver\EntityResolverInterface;
 use Drupal\serialization\EntityResolver\UuidReferenceInterface;
 
@@ -22,7 +22,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
   /**
    * The hypermedia link manager.
    *
-   * @var \Drupal\rest\LinkManager\LinkManagerInterface
+   * @var \Drupal\hal\LinkManager\LinkManagerInterface
    */
   protected $linkManager;
 
@@ -36,9 +36,9 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
   /**
    * Constructs an EntityReferenceItemNormalizer object.
    *
-   * @param \Drupal\rest\LinkManager\LinkManagerInterface $link_manager
+   * @param \Drupal\hal\LinkManager\LinkManagerInterface $link_manager
    *   The hypermedia link manager.
-   * @param \Drupal\serialization\EntityResolver\EntityResolverInterface $entity_Resolver
+   * @param \Drupal\hal\EntityResolver\EntityResolverInterface $entity_Resolver
    *   The entity resolver.
    */
   public function __construct(LinkManagerInterface $link_manager, EntityResolverInterface $entity_Resolver) {

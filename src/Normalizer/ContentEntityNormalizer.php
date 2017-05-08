@@ -8,6 +8,11 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
+use Drupal\rdf\Entity\RdfMapping;
+use ML\JsonLD\JsonLD;
+
+require 'vendor/autoload.php';
+
 /**
  * Converts the Drupal entity object structure to a JSON-LD array structure.
  */
@@ -159,13 +164,16 @@ class ContentEntityNormalizer extends NormalizerBase {
   public function denormalize($data, $class, $format = NULL, array $context = []) {
 
     // Get type, necessary for determining which bundle to create.
-    if (!isset($data['_links']['type'])) {
-      throw new UnexpectedValueException('The type link relation must be specified.');
+    if (!isset($context['bundle_type_id'])) {
+      throw new UnexpectedValueException('The ' . IslandoraConstants::ISLANDORA_BUNDLE_HEADER . ' header must be specified.');
     }
 
+    $bundle_type_id = $context['bundle_type_id'];
+    $entity_type_id = $context['entity_type_id'];
+
     // Create the entity.
-    $typed_data_ids = $this->getTypedDataIds($data['_links']['type'], $context);
-    $entity_type = $this->entityManager->getDefinition($typed_data_ids['entity_type']);
+    // $typed_data_ids = $this->getTypedDataIds($target_id, $context);.
+    $entity_type = $this->entityManager->getDefinition($entity_type_id);
     $langcode_key = $entity_type->getKey('langcode');
     $values = [];
 
@@ -178,49 +186,40 @@ class ContentEntityNormalizer extends NormalizerBase {
 
     if ($entity_type->hasKey('bundle')) {
       $bundle_key = $entity_type->getKey('bundle');
-      $values[$bundle_key] = $typed_data_ids['bundle'];
+      // $values[$bundle_key] = $typed_data_ids['bundle'];.
+      $values[$bundle_key] = $bundle_type_id;
       // Unset the bundle key from data, if it's there.
       unset($data[$bundle_key]);
     }
 
-    $entity = $this->entityManager->getStorage($typed_data_ids['entity_type'])->create($values);
+    $entity = $this->entityManager->getStorage($entity_type_id)->create($values);
+    $arrFieldsWithRDFMapping = $this->getFieldsWithRdfMapping($entity_type_id, $bundle_type_id);
 
-    // Remove links from data array.
-    unset($data['_links']);
-    // Get embedded resources and remove from data array.
-    $embedded = [];
-    if (isset($data['_embedded'])) {
-      $embedded = $data['_embedded'];
-      unset($data['_embedded']);
-    }
+    // Sort the fields by rdf mapping and get fieldNames for comparison.
+    asort($arrFieldsWithRDFMapping);
+    $fieldNames = array_keys($arrFieldsWithRDFMapping);
 
-    // Flatten the embedded values.
-    foreach ($embedded as $relation => $field) {
-      $field_ids = $this->linkManager->getRelationInternalIds($relation);
-      if (!empty($field_ids)) {
-        $field_name = $field_ids['field_name'];
-        $data[$field_name] = $field;
-      }
-    }
+    // Get the expanded JsonLD of the Entity.
+    $arrEntityExpandedJsonLD = $this->getEntityExpandedJsonLd($entity_type_id, $bundle_type_id, $arrFieldsWithRDFMapping);
+    $arrEntityExpandedJsonLD = json_decode(JsonLD::toString($arrEntityExpandedJsonLD[0], TRUE), TRUE);
 
-    // Pass the names of the fields whose values can be merged.
-    $entity->_restSubmittedFields = array_keys($data);
+    $data = $data["@graph"][0];
 
     // Iterate through remaining items in data array. These should all
     // correspond to fields.
-    foreach ($data as $field_name => $field_data) {
-      $items = $entity->get($field_name);
-      // Remove any values that were set as a part of entity creation (e.g
-      // uuid). If the incoming field data is set to an empty array, this will
-      // also have the effect of emptying the field in REST module.
-      $items->setValue([]);
-      if ($field_data) {
-        // Denormalize the field data into the FieldItemList object.
-        $context['target_instance'] = $items;
-        $this->serializer->denormalize($field_data, get_class($items), $format, $context);
+    foreach ($data as $property => $field_data) {
+      // We need to get the field_name via the RDF Mapping.
+      $fieldKey = array_search($property, array_keys($arrEntityExpandedJsonLD));
+      if ($property == "@type" || $property == "@id") {
+        continue;
       }
-    }
 
+      $field_name = $fieldNames[$fieldKey];
+      $compact_property = $arrFieldsWithRDFMapping[$field_name];
+      $field_names = $this->getFields($compact_property, $arrFieldsWithRDFMapping);
+
+      $this->denormalizeMultipleFields($entity, $field_names, $field_data, $format, $context);
+    }
     return $entity;
   }
 
@@ -283,6 +282,132 @@ class ContentEntityNormalizer extends NormalizerBase {
     }
 
     return $typed_data_ids;
+  }
+
+  /**
+   * Returns the RDF Mapping of the fields, if RDF Mapping is available.
+   *
+   * @param string $entity_type
+   *   Entity Type's name.
+   * @param string $bundle
+   *   Bundle's name.
+   *
+   * @return array
+   *   Field to RDF Mapping.
+   */
+  private function getFieldsWithRdfMapping($entity_type, $bundle) {
+    $arrFieldsWithRDFMapping = [];
+
+    // Get Fields.
+    $fields = $this->entityManager->getFieldDefinitions($entity_type, $bundle);
+
+    // Get RDF Mapping.
+    $rdfMapping = RdfMapping::load($entity_type . "." . $bundle);
+    if (!$rdfMapping) {
+      return $arrFieldsWithRDFMapping;
+    }
+
+    foreach ($fields as $field_name => $field_definition) {
+      $arrFieldMapping = $rdfMapping->getFieldMapping($field_name);
+      if (isset($arrFieldMapping['properties']) && count($arrFieldMapping["properties"]) > 0) {
+        $arrFieldsWithRDFMapping[$field_name] = $arrFieldMapping["properties"][0];
+      }
+    }
+
+    return $arrFieldsWithRDFMapping;
+  }
+
+  /**
+   * Get Expanded JsonLD of the Entity.
+   *
+   * @param string $entity_type
+   *   Entity type's name.
+   * @param string $bundle
+   *   Bundle's name.
+   * @param array $arrFieldsWithRDFMapping
+   *   Field name and rdf mapping array.
+   *
+   * @return array
+   *   Expanded JsonLD of the Entity.
+   */
+  private function getEntityExpandedJsonLd($entity_type, $bundle, array $arrFieldsWithRDFMapping) {
+
+    // Get Context.
+    $jsonldGenerator = \Drupal::service('islandora.jsonldcontextgenerator');
+
+    $bundleContext = $jsonldGenerator->getContext($entity_type . "." . $bundle);
+    $contextInfo = json_decode($bundleContext);
+
+    // Put fields into a document.
+    $arrEntityDocument = [];
+    foreach ($arrFieldsWithRDFMapping as $k => $v) {
+      $arrEntityDocument[$v] = '';
+    }
+
+    $compacted = JsonLD::compact((object) $arrEntityDocument, (object) $contextInfo);
+    $entityExpandedJsonLD = JsonLD::expand($compacted);
+
+    return $entityExpandedJsonLD;
+  }
+
+  /**
+   * Get all fields matching the RDF mapping.
+   *
+   * @param string $compact_property
+   *   Compact RDF mapping.
+   * @param array $arrFieldsWithRDFMapping
+   *   Field to RDF mapping array.
+   *
+   * @return array
+   *   Field names with same rdf mapping.
+   */
+  protected function getFields($compact_property, array $arrFieldsWithRDFMapping) {
+    $fields = array();
+    foreach ($arrFieldsWithRDFMapping as $k => $v) {
+      if ($compact_property == $v) {
+        array_push($fields, $k);
+      }
+    }
+    return $fields;
+  }
+
+  /**
+   * Create Fields mapped to same RDF.
+   *
+   * @param object $entity
+   *   Entity.
+   * @param array $field_names
+   *   Field names with rdf mapping.
+   * @param array $field_data
+   *   Crosponding data value for the field.
+   * @param string $format
+   *   Denormalize format.
+   * @param string $context
+   *   Context.
+   */
+  protected function denormalizeMultipleFields($entity, array $field_names, array $field_data, $format, $context) {
+    foreach ($field_names as &$field_name) {
+      $items = $entity->get($field_name);
+
+      // Remove any values that were set as a part of entity creation (e.g
+      // uuid). If the incoming field data is set to an empty array, this will
+      // also have the effect of emptying the field in REST module.
+      $items->setValue([]);
+      if ($field_data) {
+
+        // Remove/replace @value.
+        foreach ($field_data as $key => $data_arr) {
+          if ($data_arr['@value']) {
+            $field_data[$key]['value'] = $field_data[$key]['@value'];
+            unset($field_data[$key]['@value']);
+          }
+        }
+
+        // Denormalize the field data into the FieldItemList object.
+        $context['target_instance'] = $items;
+        $this->serializer->denormalize($field_data, get_class($items), $format, $context);
+      }
+    }
   }
 
 }

@@ -106,8 +106,33 @@ class FieldItemNormalizer extends NormalizerBase {
       }
     }
 
+    // Need to convert date into integer.
+    $field_definition = $field_item->getFieldDefinition();
+    $field_type = $field_definition->getType();
+
+    if ($field_type == "changed" || $field_type == "created" || $field_type == "timestamp") {
+      $data = $this->convertTime($data);
+    }
+
     $field_item->setValue($this->constructValue($data, $context));
     return $field_item;
+  }
+
+  /**
+   * Date format needs to be changed to support serialize <-> deserialize.
+   *
+   * @param array $data
+   *   Value data.
+   *
+   * @return array
+   *   Returns the array of converted time values.
+   */
+  protected function convertTime(array $data) {
+    foreach ($data as &$value) {
+      $newDate = new DrupalDateTime($value, 'UTC');
+      $value = $newDate->getTimestamp();
+    }
+    return $data;
   }
 
   /**

@@ -151,6 +151,6 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
 
     // Testing is failing!.
     $deNormalized = $this->serializer->deserialize($stringRepresentation, 'Drupal\islandora\Entity\FedoraResource', $this->format, $context);
-    $this->assertEquals("test", "test", "Did not normalize correctly.");
+    $this->assertEquals("test", "test", "Did not deserialize correctly.");
   }
 }

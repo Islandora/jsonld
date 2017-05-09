@@ -11,8 +11,6 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Drupal\rdf\Entity\RdfMapping;
 use ML\JsonLD\JsonLD;
 
-require 'vendor/autoload.php';
-
 /**
  * Converts the Drupal entity object structure to a JSON-LD array structure.
  */

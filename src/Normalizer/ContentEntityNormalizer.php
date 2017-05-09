@@ -360,7 +360,7 @@ class ContentEntityNormalizer extends NormalizerBase {
    *   Field names with same rdf mapping.
    */
   protected function getFields($compact_property, array $arrFieldsWithRDFMapping) {
-    $fields = array();
+    $fields = [];
     foreach ($arrFieldsWithRDFMapping as $k => $v) {
       if ($compact_property == $v) {
         array_push($fields, $k);

@@ -108,6 +108,16 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
 
   }
 
+  /**
+   * @covers \Drupal\jsonld\Normalizer\NormalizerBase::supportsNormalization
+   * @covers \Drupal\jsonld\Normalizer\NormalizerBase::escapePrefix
+   * @covers \Drupal\jsonld\Normalizer\ContentEntityNormalizer::normalize
+   * @covers \Drupal\jsonld\Normalizer\ContentEntityNormalizer::getEntityUri
+   * @covers \Drupal\jsonld\Normalizer\FieldNormalizer::normalize
+   * @covers \Drupal\jsonld\Normalizer\FieldNormalizer::normalizeFieldItems
+   * @covers \Drupal\jsonld\Normalizer\FieldItemNormalizer::normalize
+   * @covers \Drupal\jsonld\Normalizer\EntityReferenceItemNormalizer::normalize
+   */
   public function testSimpleDeNormalizeJsonld() {
     $target_entity = EntityTest::create([
       'name' => $this->randomMachineName(),
@@ -141,16 +151,16 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
     $entity = EntityTest::create($values);
     $entity->save();
 
-
     $normalized = $this->serializer->normalize($entity, $this->format);
 
     $context['entity_type_id'] = "entity_test";
     $context['bundle_type_id'] = "entity_test";
 
-    $stringRepresentation= json_encode($normalized);
+    $stringRepresentation = json_encode($normalized);
 
     // Testing is failing!.
     $deNormalized = $this->serializer->deserialize($stringRepresentation, 'Drupal\islandora\Entity\FedoraResource', $this->format, $context);
     $this->assertEquals("test", "test", "Did not deserialize correctly.");
   }
+
 }

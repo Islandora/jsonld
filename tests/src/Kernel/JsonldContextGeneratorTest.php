@@ -1,27 +1,30 @@
 <?php
 
-namespace Drupal\Tests\islandora\Kernel;
+namespace Drupal\Tests\jsonld\Kernel;
 
-use Drupal\islandora\JsonldContextGenerator\JsonldContextGenerator;
+use Drupal\Component\Utility\Random;
+use Drupal\entity_test\Entity\EntityTest;
+use Drupal\jsonld\ContextGenerator\JsonldContextGenerator;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Tests the Json-LD context Generator methods and simple integration.
  *
- * @group islandora
- * @coversDefaultClass \Drupal\islandora\JsonldContextGenerator\JsonldContextGenerator
+ * @group jsonld
+ * @coversDefaultClass \Drupal\jsonld\ContextGenerator\JsonldContextGenerator
  */
 class JsonldContextGeneratorTest extends KernelTestBase {
 
-  use FedoraContentTypeCreationTrait {
-    createFedoraResourceContentType as drupalCreateFedoraContentType;
-  }
   public static $modules = [
-    'system',
-    'rdf',
-    'islandora',
+    'entity',
     'entity_test',
+    'hal',
+    'jsonld',
+    'rdf',
     'rdf_test_namespaces',
+    'serialization',
+    'system',
+    'typed_data',
   ];
 
 
@@ -40,9 +43,9 @@ class JsonldContextGeneratorTest extends KernelTestBase {
   protected $state;
 
   /**
-   * The JsonldContextGenerator we are testing.
+   * The ContextGenerator we are testing.
    *
-   * @var \Drupal\islandora\JsonldContextGenerator\JsonldContextGeneratorInterface
+   * @var \Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface
    */
   protected $theJsonldContextGenerator;
 
@@ -70,13 +73,13 @@ class JsonldContextGeneratorTest extends KernelTestBase {
         $this->container->get('entity_type.bundle.info'),
         $this->container->get('entity_type.manager'),
         $this->container->get('cache.default'),
-        $this->container->get('logger.channel.islandora')
+        $this->container->get('logger.channel.jsonld')
       );
 
   }
 
   /**
-   * @covers \Drupal\islandora\JsonldContextGenerator\JsonldContextGenerator::getContext
+   * @covers \Drupal\jsonld\ContextGenerator\JsonldContextGenerator::getContext
    */
   public function testGetContext() {
     // Test with known asserts.
@@ -92,17 +95,17 @@ class JsonldContextGeneratorTest extends KernelTestBase {
    * Tests Exception in case of no rdf type.
    *
    * @expectedException \Exception
-   * @covers \Drupal\islandora\JsonldContextGenerator\JsonldContextGenerator::getContext
+   * @covers \Drupal\jsonld\ContextGenerator\JsonldContextGenerator::getContext
    */
   public function testGetContextException() {
     // This should throw the expected Exception.
-    $newFedoraEntity = $this->drupalCreateFedoraContentType();
-    $this->theJsonldContextGenerator->getContext('fedora_resource.' . $newFedoraEntity->id());
+    $newEntity = $this->createContentType();
+    $this->theJsonldContextGenerator->getContext('entity_test.' . $newEntity->id());
 
   }
 
   /**
-   * @covers \Drupal\islandora\JsonldContextGenerator\JsonldContextGenerator::generateContext
+   * @covers \Drupal\jsonld\ContextGenerator\JsonldContextGenerator::generateContext
    */
   public function testGenerateContext() {
     // Test with known asserts.
@@ -119,14 +122,37 @@ class JsonldContextGeneratorTest extends KernelTestBase {
    * Tests Exception in case of no rdf type.
    *
    * @expectedException \Exception
-   * @covers \Drupal\islandora\JsonldContextGenerator\JsonldContextGenerator::generateContext
+   * @covers \Drupal\jsonld\ContextGenerator\JsonldContextGenerator::generateContext
    */
   public function testGenerateContextException() {
     // This should throw the expected Exception.
-    $newFedoraEntity = $this->drupalCreateFedoraContentType();
-    $rdfMapping = rdf_get_mapping('fedora_resource', $newFedoraEntity->id());
-    $this->theJsonldContextGenerator->getContext('fedora_resource.' . $newFedoraEntity->id());
+    $newEntity = $this->createContentType();
+    $rdfMapping = rdf_get_mapping('entity_test', $newEntity->id());
+    $this->theJsonldContextGenerator->getContext('entity_test.' . $newEntity->id());
 
+  }
+
+  /**
+   *
+   */
+  private function createContentType(array $values = []) {
+    // Find a non-existent random type name.
+    $random = new Random();
+    if (!isset($values['type'])) {
+      do {
+        $id = strtolower($random->string(8));
+      } while (EntityTest::load($id));
+    }
+    else {
+      $id = $values['type'];
+    }
+    $values += [
+      'id' => $id,
+      'label' => $id,
+    ];
+    $type = EntityTest::create($values);
+    $type->save();
+    return $type;
   }
 
 }

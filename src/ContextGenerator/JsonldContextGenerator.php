@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\islandora\JsonldContextGenerator;
+namespace Drupal\jsonld\ContextGenerator;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -15,16 +15,16 @@ use Psr\Log\LoggerInterface;
 /**
  * A reliable JSON-LD @Context generation class.
  *
- * Class JsonldContextGenerator.
+ * Class ContextGenerator.
  *
- * @package Drupal\islandora\JsonldContextGenerator
+ * @package Drupal\jsonld\ContextGenerator
  */
 class JsonldContextGenerator implements JsonldContextGeneratorInterface {
 
   /**
    * Constant Naming convention used to prefix name cache bins($cid)
    */
-  const CACHE_BASE_CID = 'islandora:jsonld:context';
+  const CACHE_BASE_CID = 'jsonld:context';
 
 
   /**
@@ -64,7 +64,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
   protected $logger;
 
   /**
-   * Constructs a JsonldContextGenerator object.
+   * Constructs a ContextGenerator object.
    *
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity manager.
@@ -88,7 +88,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
   /**
    * {@inheritdoc}
    */
-  public function getContext($ids = 'fedora_resource.rdf_source') {
+  public function getContext($ids) {
     $cid = JsonldContextGenerator::CACHE_BASE_CID . $ids;
     $cache = $this->cache->get($cid);
     $data = '';

@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\islandora\JsonldContextGenerator;
+namespace Drupal\jsonld\ContextGenerator;
 
 use Drupal\rdf\RdfMappingInterface;
 
 /**
  * Interface for a service that provides per Bundle JSON-LD Context generation.
  *
- * @ingroup: islandora
+ * @ingroup: jsonld
  */
 interface JsonldContextGeneratorInterface {
 

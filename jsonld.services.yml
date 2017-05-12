@@ -36,4 +36,3 @@ services:
   jsonld.contextgenerator:
     class: Drupal\jsonld\ContextGenerator\JsonldContextGenerator
     arguments: ['@entity_field.manager','@entity_type.bundle.info','@entity_type.manager', '@cache.default', '@logger.channel.jsonld']
-

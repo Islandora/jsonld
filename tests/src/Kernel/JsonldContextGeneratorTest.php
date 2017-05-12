@@ -133,7 +133,13 @@ class JsonldContextGeneratorTest extends KernelTestBase {
   }
 
   /**
+   * Helper function to generate a fake bundle.
    *
+   * @param array $values
+   *   Array of values to create the bundle.
+   *
+   * @return \Drupal\entity_test\Entity\EntityTest
+   *   A new bundle.
    */
   private function createContentType(array $values = []) {
     // Find a non-existent random type name.

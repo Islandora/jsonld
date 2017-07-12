@@ -110,7 +110,9 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
         $field->getFieldDefinition(),
         $context['namespaces']
       );
-      $values_clean = $values_clean + $field_context[$field_keys[0]];
+      if (isset($field_context[$field_keys[0]])) {
+        $values_clean = $values_clean + $field_context[$field_keys[0]];
+      }
       // Since getting the to embed entity URL here could be a little bit
       // expensive and would require an helper method
       // i could just borrow it from the $embed result.

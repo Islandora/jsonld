@@ -82,7 +82,9 @@ class FieldItemNormalizer extends NormalizerBase {
           $field->getFieldDefinition(),
           $context['namespaces']
         );
-        $values_clean = $values_clean + $field_context[$field_keys[0]];
+        if (isset($field_context[$field_keys[0]])) {
+          $values_clean = $values_clean + $field_context[$field_keys[0]];
+        }
 
       }
       else {

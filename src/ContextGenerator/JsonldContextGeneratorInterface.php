@@ -2,6 +2,7 @@
 
 namespace Drupal\jsonld\ContextGenerator;
 
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\rdf\RdfMappingInterface;
 
 /**
@@ -40,5 +41,22 @@ interface JsonldContextGeneratorInterface {
    *    If no RDF mapping exists.
    */
   public function getContext($ids);
+
+  /**
+   * Gets the correct piece of @context for a given entity field.
+   *
+   * @param \Drupal\rdf\RdfMappingInterface $rdfMapping
+   *   Rdf mapping object.
+   * @param string $field_name
+   *   The name of the field.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $fieldDefinition
+   *   The definition of the field.
+   * @param array $allRdfNameSpaces
+   *   Every RDF prefixed namespace in this Drupal.
+   *
+   * @return array
+   *   Piece of JSON-LD context that supports this field
+   */
+  public function getFieldsRdf(RdfMappingInterface $rdfMapping, $field_name, FieldDefinitionInterface $fieldDefinition, array $allRdfNameSpaces);
 
 }

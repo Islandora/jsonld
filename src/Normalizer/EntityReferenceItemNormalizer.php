@@ -4,6 +4,7 @@ namespace Drupal\jsonld\Normalizer;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
+use Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface;
 use Drupal\serialization\EntityResolver\EntityResolverInterface;
 use Drupal\serialization\EntityResolver\UuidReferenceInterface;
 
@@ -38,11 +39,15 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
    *
    * @param \Drupal\hal\LinkManager\LinkManagerInterface $link_manager
    *   The hypermedia link manager.
-   * @param \Drupal\hal\EntityResolver\EntityResolverInterface $entity_Resolver
+   * @param \Drupal\serialization\EntityResolver\EntityResolverInterface $entity_Resolver
    *   The entity resolver.
+   * @param \Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface $jsonld_context
+   *   The Json-Ld context service.
    */
-  public function __construct(LinkManagerInterface $link_manager, EntityResolverInterface $entity_Resolver) {
-
+  public function __construct(LinkManagerInterface $link_manager,
+  EntityResolverInterface $entity_Resolver,
+                              JsonldContextGeneratorInterface $jsonld_context) {
+    parent::__construct($jsonld_context);
     $this->linkManager = $link_manager;
     $this->entityResolver = $entity_Resolver;
   }
@@ -98,6 +103,14 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
         $arguments = isset($field_mappings['datatype_callback']['arguments']) ? $field_mappings['datatype_callback']['arguments'] : NULL;
         $values_clean['@value'] = call_user_func($callback, $target_entity, $arguments);
       }
+      $field = $field_item->getParent();
+      $field_context = $this->jsonldContextgenerator->getFieldsRdf(
+        $context['current_entity_rdf_mapping'],
+        $field->getName(),
+        $field->getFieldDefinition(),
+        $context['namespaces']
+      );
+      $values_clean = $values_clean + $field_context[$field_keys[0]];
       // Since getting the to embed entity URL here could be a little bit
       // expensive and would require an helper method
       // i could just borrow it from the $embed result.
@@ -109,6 +122,10 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
         // If there's no context, we need full predicates, not shortened ones.
         if (!$context['needs_jsonldcontext']) {
           $field_name = $this->escapePrefix($field_name, $context['namespaces']);
+          foreach ($values_clean as $key => $val) {
+            // Expand values in the array, ie. @type values xsd:string.
+            $values_clean[$key] = $this->escapePrefix($val, $context['namespaces']);
+          }
         }
         $normalized_prop[$field_name] = [$values_clean];
       }

@@ -72,27 +72,25 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
           'http://purl.org/dc/terms/title' => [
             [
               '@value' => $values['name'],
-              '@type' => 'xsd:string',
-              '@language' => 'en',
+              '@type' => 'http://www.w3.org/2001/XMLSchema#string',
             ],
           ],
           'http://schema.org/dateCreated' => [
             [
               '@value' => $iso,
-              '@type' => 'xsd:dateTime',
-              '@language' => 'en',
+              '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
             ],
           ],
           'http://purl.org/dc/terms/abstract' => [
             [
               '@value' => $values['field_test_text']['value'],
-              '@type' => 'xsd:string',
+              '@type' => 'http://www.w3.org/2001/XMLSchema#string',
             ],
           ],
           'http://purl.org/dc/terms/references' => [
             [
               '@id' => $this->getEntityUri($target_entity),
-              '@type' => 'xsd:nonNegativeInteger',
+              '@type' => 'http://www.w3.org/2001/XMLSchema#nonNegativeInteger',
             ],
           ],
         ],

@@ -194,7 +194,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
    * @return array
    *   Piece of JSON-LD context that supports this field
    */
-  private function getFieldsRdf(RdfMappingInterface $rdfMapping, $field_name, FieldDefinitionInterface $fieldDefinition, array $allRdfNameSpaces) {
+  public function getFieldsRdf(RdfMappingInterface $rdfMapping, $field_name, FieldDefinitionInterface $fieldDefinition, array $allRdfNameSpaces) {
     $termDefinition = [];
     $fieldContextFragment = [];
     $fieldRDFMapping = $rdfMapping->getPreparedFieldMapping($field_name);

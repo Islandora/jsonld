@@ -6,6 +6,7 @@ services:
       - { name: normalizer, priority: 10 }
   serializer.normalizer.field_item.jsonld:
     class: Drupal\jsonld\Normalizer\FieldItemNormalizer
+    arguments: ['@jsonld.contextgenerator']
     tags:
       - { name: normalizer, priority: 10 }
   serializer.normalizer.field.jsonld:

@@ -57,7 +57,6 @@ class FieldItemNormalizer extends NormalizerBase {
     else {
       $values_clean['@value'] = $values['value'];
       if (isset($context['current_entity_rdf_mapping'])) {
-        $values_clean = [];
         // So why i am passing the whole rdf mapping object and not
         // only the predicate? Well because i hope i will be able
         // to MAP to RDF also sub fields of a complex field someday

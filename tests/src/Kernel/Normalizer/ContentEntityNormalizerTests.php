@@ -4,6 +4,7 @@ namespace Drupal\Tests\jsonld\Kernel\Normalizer;
 
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\jsonld\Kernel\JsonldKernelTestBase;
+use Drupal\user\Entity\User;
 
 /**
  * Class ContentEntityTests.
@@ -32,6 +33,7 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
    * @covers \Drupal\jsonld\Normalizer\EntityReferenceItemNormalizer::normalize
    */
   public function testSimpleNormalizeJsonld() {
+
     $target_entity = EntityTest::create([
       'name' => $this->randomMachineName(),
       'langcode' => 'en',
@@ -39,16 +41,37 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
     ]);
     $target_entity->save();
 
+    $target_user = User::create([
+      'name' => $this->randomMachineName(),
+      'langcode' => 'en',
+    ]);
+    $target_user->save();
+
+    rdf_get_mapping('entity_test', 'entity_test')->setBundleMapping(
+      [
+        'types' => [
+          "schema:ImageObject",
+        ],
+      ])->setFieldMapping('field_test_text', [
+        'properties' => ['dc:description'],
+      ])->setFieldMapping('user_id', [
+        'properties' => ['schema:author'],
+      ])->setFieldMapping('modified', [
+        'properties' => ['schema:dateModified'],
+        'datatype' => 'xsd:dateTime',
+      ])->save();
+
     $tz = new \DateTimeZone('UTC');
     $dt = new \DateTime(NULL, $tz);
     $created = $dt->format("U");
-    $iso = $dt->format(\DateTime::W3C);
+    $created_iso = $dt->format(\DateTime::W3C);
     // Create an entity.
     $values = [
       'langcode' => 'en',
       'name' => $this->randomMachineName(),
       'type' => 'entity_test',
       'bundle' => 'entity_test',
+      'user_id' => $target_user->id(),
       'created' => [
         'value' => $created,
       ],
@@ -65,38 +88,50 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
     $entity->save();
 
     $expected = [
-      '@graph' => [
+      "@graph" => [
         [
-          '@id' => $this->getEntityUri($entity),
-          '@type' => ['http://schema.org/Thing'],
-          'http://purl.org/dc/terms/title' => [
+          "@id" => $this->getEntityUri($entity),
+          "@type" => [
+            'http://schema.org/ImageObject',
+          ],
+          "http://purl.org/dc/terms/references" => [
             [
-              '@value' => $values['name'],
-              '@type' => 'http://www.w3.org/2001/XMLSchema#string',
+              "@id" => $this->getEntityUri($target_entity),
             ],
           ],
-          'http://schema.org/dateCreated' => [
+          "http://purl.org/dc/terms/description" => [
             [
-              '@value' => $iso,
-              '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
+              "@type" => "http://www.w3.org/2001/XMLSchema#string",
+              "@value" => $values['field_test_text']['value'],
             ],
           ],
-          'http://purl.org/dc/terms/abstract' => [
+          "http://purl.org/dc/terms/title" => [
             [
-              '@value' => $values['field_test_text']['value'],
-              '@type' => 'http://www.w3.org/2001/XMLSchema#string',
+              "@type" => "http://www.w3.org/2001/XMLSchema#string",
+              "@value" => $values['name'],
             ],
           ],
-          'http://purl.org/dc/terms/references' => [
+          "http://schema.org/author" => [
             [
-              '@id' => $this->getEntityUri($target_entity),
-              '@type' => 'http://www.w3.org/2001/XMLSchema#nonNegativeInteger',
+              "@id" => $this->getEntityUri($target_user),
+            ],
+          ],
+          "http://schema.org/dateCreated" => [
+            [
+              "@type" => "http://www.w3.org/2001/XMLSchema#dateTime",
+              "@value" => $created_iso,
             ],
           ],
         ],
         [
-          '@id' => $this->getEntityUri($target_entity),
-          '@type' => ['http://schema.org/Thing'],
+          "@id" => $this->getEntityUri($target_user),
+          "@type" => "http://localhost/rest/type/user/user",
+        ],
+        [
+          "@id" => $this->getEntityUri($target_entity),
+          "@type" => [
+            "http://schema.org/ImageObject",
+          ],
         ],
       ],
     ];

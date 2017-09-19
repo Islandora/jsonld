@@ -104,20 +104,15 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
         $arguments = isset($field_mappings['datatype_callback']['arguments']) ? $field_mappings['datatype_callback']['arguments'] : NULL;
         $values_clean['@value'] = call_user_func($callback, $target_entity, $arguments);
       }
-      $field = $field_item->getParent();
-      $field_context = $this->jsonldContextgenerator->getFieldsRdf(
-        $context['current_entity_rdf_mapping'],
-        $field->getName(),
-        $field->getFieldDefinition(),
-        $context['namespaces']
-      );
-      if (isset($field_context[$field_keys[0]])) {
-        $values_clean = $values_clean + $field_context[$field_keys[0]];
-      }
       // Since getting the to embed entity URL here could be a little bit
       // expensive and would require an helper method
       // i could just borrow it from the $embed result.
       $values_clean['@id'] = key($embedded['@graph']);
+      // Because having a @type for a reference causes problems, we strip that.
+      // This could be removed using headers in future.
+      if (isset($values_clean['@type'])) {
+        unset($values_clean['@type']);
+      }
 
       // The returned structure will be recursively merged into the normalized
       // JSON-LD @Graph.

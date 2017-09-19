@@ -151,11 +151,13 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
 
     $chain_resolver = new ChainEntityResolver([new UuidResolver($entity_manager), new TargetIdResolver()]);
 
+    $jsonld_context_generator = $this->container->get('jsonld.contextgenerator');
+
     // Set up the mock serializer.
     $normalizers = [
       new ContentEntityNormalizer($link_manager, $entity_manager, \Drupal::moduleHandler()),
-      new EntityReferenceItemNormalizer($link_manager, $chain_resolver),
-      new FieldItemNormalizer(),
+      new EntityReferenceItemNormalizer($link_manager, $chain_resolver, $jsonld_context_generator),
+      new FieldItemNormalizer($jsonld_context_generator),
       new FieldNormalizer(),
     ];
 

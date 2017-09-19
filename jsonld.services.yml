@@ -1,11 +1,12 @@
 services:
   serializer.normalizer.entity_reference_item.jsonld:
     class: Drupal\jsonld\Normalizer\EntityReferenceItemNormalizer
-    arguments: ['@hal.link_manager', '@serializer.entity_resolver']
+    arguments: ['@hal.link_manager', '@serializer.entity_resolver', '@jsonld.contextgenerator']
     tags:
       - { name: normalizer, priority: 10 }
   serializer.normalizer.field_item.jsonld:
     class: Drupal\jsonld\Normalizer\FieldItemNormalizer
+    arguments: ['@jsonld.contextgenerator']
     tags:
       - { name: normalizer, priority: 10 }
   serializer.normalizer.field.jsonld:

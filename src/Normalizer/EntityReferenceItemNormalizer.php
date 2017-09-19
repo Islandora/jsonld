@@ -4,6 +4,7 @@ namespace Drupal\jsonld\Normalizer;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
+use Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface;
 use Drupal\serialization\EntityResolver\EntityResolverInterface;
 use Drupal\serialization\EntityResolver\UuidReferenceInterface;
 
@@ -38,11 +39,15 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
    *
    * @param \Drupal\hal\LinkManager\LinkManagerInterface $link_manager
    *   The hypermedia link manager.
-   * @param \Drupal\hal\EntityResolver\EntityResolverInterface $entity_Resolver
+   * @param \Drupal\serialization\EntityResolver\EntityResolverInterface $entity_Resolver
    *   The entity resolver.
+   * @param \Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface $jsonld_context
+   *   The Json-Ld context service.
    */
-  public function __construct(LinkManagerInterface $link_manager, EntityResolverInterface $entity_Resolver) {
-
+  public function __construct(LinkManagerInterface $link_manager,
+  EntityResolverInterface $entity_Resolver,
+                              JsonldContextGeneratorInterface $jsonld_context) {
+    parent::__construct($jsonld_context);
     $this->linkManager = $link_manager;
     $this->entityResolver = $entity_Resolver;
   }
@@ -76,6 +81,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
     $embedded = $this->serializer->normalize($target_entity, $format, $context);
 
     if (isset($context['current_entity_rdf_mapping'])) {
+      $values_clean = [];
       // So why i am passing the whole rdf mapping object and not
       // only the predicate? Well because i hope i will be able
       // to MAP to RDF also sub fields of a complex field someday
@@ -102,6 +108,11 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
       // expensive and would require an helper method
       // i could just borrow it from the $embed result.
       $values_clean['@id'] = key($embedded['@graph']);
+      // Because having a @type for a reference causes problems, we strip that.
+      // This could be removed using headers in future.
+      if (isset($values_clean['@type'])) {
+        unset($values_clean['@type']);
+      }
 
       // The returned structure will be recursively merged into the normalized
       // JSON-LD @Graph.
@@ -109,6 +120,10 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
         // If there's no context, we need full predicates, not shortened ones.
         if (!$context['needs_jsonldcontext']) {
           $field_name = $this->escapePrefix($field_name, $context['namespaces']);
+          foreach ($values_clean as $key => $val) {
+            // Expand values in the array, ie. @type values xsd:string.
+            $values_clean[$key] = $this->escapePrefix($val, $context['namespaces']);
+          }
         }
         $normalized_prop[$field_name] = [$values_clean];
       }

@@ -3,6 +3,7 @@
 namespace Drupal\jsonld\Normalizer;
 
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
@@ -16,6 +17,23 @@ class FieldItemNormalizer extends NormalizerBase {
    * @var string
    */
   protected $supportedInterfaceOrClass = 'Drupal\Core\Field\FieldItemInterface';
+
+  /**
+   * Json-Ld context generator service.
+   *
+   * @var \Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface
+   */
+  protected $jsonldContextgenerator;
+
+  /**
+   * FieldItemNormalizer constructor.
+   *
+   * @param \Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface $jsonld_context
+   *   Json-Ld context generator service.
+   */
+  public function __construct(JsonldContextGeneratorInterface $jsonld_context) {
+    $this->jsonldContextgenerator = $jsonld_context;
+  }
 
   /**
    * {@inheritdoc}
@@ -58,12 +76,22 @@ class FieldItemNormalizer extends NormalizerBase {
           $arguments = isset($field_mappings['datatype_callback']['arguments']) ? $field_mappings['datatype_callback']['arguments'] : NULL;
           $values_clean['@value'] = call_user_func($callback, $values, $arguments);
         }
+        $field_context = $this->jsonldContextgenerator->getFieldsRdf(
+          $context['current_entity_rdf_mapping'],
+          $field->getName(),
+          $field->getFieldDefinition(),
+          $context['namespaces']
+        );
+        if (isset($field_context[$field_keys[0]])) {
+          $values_clean = $values_clean + $field_context[$field_keys[0]];
+        }
+
       }
       else {
         $field_keys = [$field->getName()];
       }
-
-      if (isset($context['langcode'])) {
+      // JSON-LD Spec says you can't have an @language for a typed values.
+      if (isset($context['langcode']) && !isset($values_clean['@type'])) {
         $values_clean['@language'] = $context['langcode'];
       }
       array_filter($values_clean);
@@ -74,6 +102,10 @@ class FieldItemNormalizer extends NormalizerBase {
         // If there's no context, we need full predicates, not shortened ones.
         if (!$context['needs_jsonldcontext']) {
           $field_name = $this->escapePrefix($field_name, $context['namespaces']);
+          foreach ($values_clean as $key => $val) {
+            // Expand values in the array, ie. @type values xsd:string.
+            $values_clean[$key] = $this->escapePrefix($val, $context['namespaces']);
+          }
         }
         $normalized[$field_name] = [$values_clean];
       }

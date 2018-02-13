@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
+use Drupal\jsonld\ContextProvider\JsonldContextProvider;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -67,12 +68,17 @@ class ContentEntityNormalizer extends NormalizerBase {
     // @TODO check $format before going RDF crazy
     $normalized = [];
 
+    if (isset($context['depth'])) {
+      $context['depth'] += 1;
+    }
+
     $context += [
       'account' => NULL,
       'included_fields' => NULL,
       'needs_jsonldcontext' => FALSE,
       'embedded' => FALSE,
       'namespaces' => rdf_get_namespaces(),
+      'depth' => 0,
     ];
 
     if ($context['needs_jsonldcontext']) {
@@ -95,7 +101,7 @@ class ContentEntityNormalizer extends NormalizerBase {
     // not shortened ones. So we replace them in place.
     if ($context['needs_jsonldcontext'] === FALSE && is_array($types)) {
       for ($i = 0; $i < count($types); $i++) {
-        $types[$i] = $this->escapePrefix($types[$i], $context['namespaces']);
+        $types[$i] = ContentEntityNormalizer::escapePrefix($types[$i], $context['namespaces']);
       }
     }
 
@@ -126,6 +132,7 @@ class ContentEntityNormalizer extends NormalizerBase {
 
     $context['current_entity_id'] = $this->getEntityUri($entity);
     $context['current_entity_rdf_mapping'] = $rdf_mappings;
+
     foreach ($fields as $name => $field) {
       // Just process fields that have rdf mappings defined.
       // We could also pass as not contextualized keys the others
@@ -150,7 +157,45 @@ class ContentEntityNormalizer extends NormalizerBase {
     if (!$context['embedded']) {
       $normalized['@graph'] = array_values($normalized['@graph']);
     }
+
+    if (isset($context['depth']) && $context['depth'] == 0) {
+      self::executeContextReactions($entity, $normalized, $context);
+    }
     return $normalized;
+  }
+
+  /**
+   * Executes any context reactions.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The current entity.
+   * @param array|null $normalized
+   *   The array of normalized json-ld.
+   * @param array|null $context
+   *   The context used by the normalizer.
+   */
+  private static function executeContextReactions(EntityInterface $entity, array &$normalized = NULL, array $context = NULL) {
+    switch ($entity->getEntityType()->id()) {
+      case "node":
+      case "media":
+      case "file":
+        $provider = new JsonldContextProvider($entity);
+        break;
+
+      default:
+        $provider = NULL;
+        break;
+    }
+
+    if ($provider) {
+      $context_manager = \Drupal::service('context.manager');
+      $provided = $provider->getRuntimeContexts([]);
+      $context_manager->evaluateContexts($provided);
+
+      foreach ($context_manager->getActiveReactions('\Drupal\jsonld\ContextReaction\NormalizerAlterReaction') as $reaction) {
+        $reaction->execute($entity, $normalized, $context);
+      }
+    }
   }
 
   /**
@@ -238,9 +283,9 @@ class ContentEntityNormalizer extends NormalizerBase {
     // Some entity types don't provide a canonical link template, at least call
     // out to ->url().
     if ($entity->isNew() || !$entity->hasLinkTemplate('canonical')) {
-      return $entity->url('canonical', []);
+      return $entity->toUrl('canonical', []);
     }
-    $url = $entity->urlInfo('canonical', ['absolute' => TRUE]);
+    $url = $entity->toUrl('canonical', ['absolute' => TRUE]);
     return $url->setRouteParameter('_format', 'jsonld')->toString();
   }
 

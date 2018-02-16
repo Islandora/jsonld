@@ -12,7 +12,6 @@ use Drupal\KernelTests\KernelTestBase;
  *
  * @group jsonld
  * @coversDefaultClass \Drupal\jsonld\ContextGenerator\JsonldContextGenerator
- * @requires module typed_data
  */
 class JsonldContextGeneratorTest extends KernelTestBase {
 
@@ -25,7 +24,6 @@ class JsonldContextGeneratorTest extends KernelTestBase {
     'rdf_test_namespaces',
     'serialization',
     'system',
-    'typed_data',
   ];
 
 

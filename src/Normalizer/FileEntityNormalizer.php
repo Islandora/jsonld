@@ -2,8 +2,9 @@
 
 namespace Drupal\jsonld\Normalizer;
 
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
 use GuzzleHttp\ClientInterface;
 
@@ -27,9 +28,16 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
   protected $httpClient;
 
   /**
+   * The Drupal file system.
+   *
+   * @var \Drupal\Core\File\FileSystemInterface
+   */
+  protected $fileSystem;
+
+  /**
    * Constructs a FileEntityNormalizer object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
    *   The entity manager.
    * @param \GuzzleHttp\ClientInterface $http_client
    *   The HTTP Client.
@@ -37,12 +45,19 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
    *   The hypermedia link manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   *   The file system handler.
    */
-  public function __construct(EntityManagerInterface $entity_manager, ClientInterface $http_client, LinkManagerInterface $link_manager, ModuleHandlerInterface $module_handler) {
+  public function __construct(EntityTypeManagerInterface $entity_manager,
+                              ClientInterface $http_client,
+                              LinkManagerInterface $link_manager,
+                              ModuleHandlerInterface $module_handler,
+                              FileSystemInterface $file_system) {
 
     parent::__construct($link_manager, $entity_manager, $module_handler);
 
     $this->httpClient = $http_client;
+    $this->fileSystem = $file_system;
   }
 
   /**
@@ -64,7 +79,7 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
 
     $file_data = (string) $this->httpClient->get($data['uri'][0]['value'])->getBody();
 
-    $path = 'temporary://' . drupal_basename($data['uri'][0]['value']);
+    $path = 'temporary://' . $this->fileSystem->basename($data['uri'][0]['value']);
     $data['uri'] = file_unmanaged_save_data($file_data, $path);
 
     return $this->entityManager->getStorage('file')->create($data);

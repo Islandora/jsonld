@@ -3,16 +3,17 @@
 namespace Drupal\jsonld\Normalizer;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
-use Drupal\jsonld\ContextProvider\JsonldContextProvider;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Converts the Drupal entity object structure to a JSON-LD array structure.
  */
 class ContentEntityNormalizer extends NormalizerBase {
+
+  const NORMALIZE_ALTER_HOOK = "jsonld_alter_normalized_array";
 
   /**
    * The interface or class that this Normalizer supports.
@@ -47,12 +48,12 @@ class ContentEntityNormalizer extends NormalizerBase {
    *
    * @param \Drupal\hal\LinkManager\LinkManagerInterface $link_manager
    *   The hypermedia link manager.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
    *   The entity manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    */
-  public function __construct(LinkManagerInterface $link_manager, EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler) {
+  public function __construct(LinkManagerInterface $link_manager, EntityTypeManagerInterface $entity_manager, ModuleHandlerInterface $module_handler) {
 
     $this->linkManager = $link_manager;
     $this->entityManager = $entity_manager;
@@ -159,43 +160,11 @@ class ContentEntityNormalizer extends NormalizerBase {
     }
 
     if (isset($context['depth']) && $context['depth'] == 0) {
-      self::executeContextReactions($entity, $normalized, $context);
+      $this->moduleHandler->invokeAll(self::NORMALIZE_ALTER_HOOK,
+        [$entity, &$normalized, $context]
+      );
     }
     return $normalized;
-  }
-
-  /**
-   * Executes any context reactions.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The current entity.
-   * @param array|null $normalized
-   *   The array of normalized json-ld.
-   * @param array|null $context
-   *   The context used by the normalizer.
-   */
-  private static function executeContextReactions(EntityInterface $entity, array &$normalized = NULL, array $context = NULL) {
-    switch ($entity->getEntityType()->id()) {
-      case "node":
-      case "media":
-      case "file":
-        $provider = new JsonldContextProvider($entity);
-        break;
-
-      default:
-        $provider = NULL;
-        break;
-    }
-
-    if ($provider) {
-      $context_manager = \Drupal::service('context.manager');
-      $provided = $provider->getRuntimeContexts([]);
-      $context_manager->evaluateContexts($provided);
-
-      foreach ($context_manager->getActiveReactions('\Drupal\jsonld\ContextReaction\NormalizerAlterReaction') as $reaction) {
-        $reaction->execute($entity, $normalized, $context);
-      }
-    }
   }
 
   /**

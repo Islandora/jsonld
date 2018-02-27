@@ -63,7 +63,11 @@ class FieldItemNormalizer extends NormalizerBase {
         // and somehow.
         $field_mappings = $context['current_entity_rdf_mapping']->getPreparedFieldMapping($field->getName());
         $field_keys = isset($field_mappings['properties']) ? $field_mappings['properties'] : [$field->getName()];
-        if (!empty($field_mappings['datatype'])) {
+
+        // JSON-LD xsd:string https://json-ld.org/spec/latest/json-ld/#dfn-strings. 
+        // Getting rid of @type to allow @language 
+        // @see https://json-ld.org/spec/latest/json-ld/#string-internationalization
+        if (!empty($field_mappings['datatype']) && $field_mappings['datatype'] != "xsd:string"){
           $values_clean['@type'] = $field_mappings['datatype'];
         }
 

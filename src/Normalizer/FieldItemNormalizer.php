@@ -67,7 +67,7 @@ class FieldItemNormalizer extends NormalizerBase {
         // JSON-LD xsd:string https://json-ld.org/spec/latest/json-ld/#dfn-strings. 
         // Getting rid of @type to allow @language 
         // @see https://json-ld.org/spec/latest/json-ld/#string-internationalization
-        print_r($field_mappings['datatype']);
+        print_r($field_mappings);
         if (!empty($field_mappings['datatype']) && $field_mappings['datatype'] != "xsd:string"){
           $values_clean['@type'] = $field_mappings['datatype'];
         }
@@ -95,6 +95,7 @@ class FieldItemNormalizer extends NormalizerBase {
       else {
         $field_keys = [$field->getName()];
       }
+      print_r($field_keys);
       // JSON-LD Spec says you can't have an @language for a typed values.
       if (isset($context['langcode']) && !isset($values_clean['@type'])) {
         $values_clean['@language'] = $context['langcode'];

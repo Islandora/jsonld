@@ -64,11 +64,12 @@ class FieldItemNormalizer extends NormalizerBase {
         $field_mappings = $context['current_entity_rdf_mapping']->getPreparedFieldMapping($field->getName());
         $field_keys = isset($field_mappings['properties']) ? $field_mappings['properties'] : [$field->getName()];
 
-        // JSON-LD xsd:string https://json-ld.org/spec/latest/json-ld/#dfn-strings. 
-        // Getting rid of @type to allow @language 
+        // Getting rid of @type to allow @language
         // @see https://json-ld.org/spec/latest/json-ld/#string-internationalization
         print_r($field_mappings);
-        if (!empty($field_mappings['datatype']) && $field_mappings['datatype'] != "xsd:string"){
+        if (!empty($field_mappings['datatype'])
+          && $field_mappings['datatype'] != "xsd:string"
+          &&  $field_mappings['datatype'] != "http://www.w3.org/2001/XMLSchema#string") {
           $values_clean['@type'] = $field_mappings['datatype'];
         }
 
@@ -87,6 +88,7 @@ class FieldItemNormalizer extends NormalizerBase {
           $field->getFieldDefinition(),
           $context['namespaces']
         );
+        print_r($field_context);
         if (isset($field_context[$field_keys[0]])) {
           $values_clean = $values_clean + $field_context[$field_keys[0]];
         }
@@ -116,7 +118,7 @@ class FieldItemNormalizer extends NormalizerBase {
         $normalized[$field_name] = [$values_clean];
       }
       print_r($normalized);
-     
+
       return $normalized;
     }
   }

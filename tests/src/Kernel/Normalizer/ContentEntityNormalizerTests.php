@@ -153,18 +153,18 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
    */
   public function testLocalizedNormalizeJsonld() {
 
-    $target_entity = EntityTest::create([
+    $target_entity_tl = EntityTest::create([
       'name' => $this->randomMachineName(),
-      'langcode' => 'en',
+      'langcode' => 'ho',
       'field_test_entity_reference' => NULL,
     ]);
-    $target_entity->save();
+    $target_entity_tl->save();
 
-    $target_user = User::create([
-      'name' => $this->randomMachineName(),
-      'langcode' => 'en',
+    $target_user_tl = User::create([
+      'name' => 'Tooh',
+      'langcode' => 'ho',
     ]);
-    $target_user->save();
+    $target_user_tl->save();
 
     rdf_get_mapping('entity_test', 'entity_test')->setBundleMapping(
       [
@@ -174,7 +174,7 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
       ])->setFieldMapping('field_test_text', [
         'properties' => ['dc:description'],
       ])->setFieldMapping('user_id', [
-        'properties' => ['schema:author'],
+        'properties' => ['schema:contributor'],
       ])->setFieldMapping('modified', [
         'properties' => ['schema:dateModified'],
         'datatype' => 'xsd:dateTime',
@@ -190,7 +190,7 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
       'name' => 'In Canadian english',
       'type' => 'entity_test',
       'bundle' => 'entity_test',
-      'user_id' => $target_user->id(),
+      'user_id' => $target_user_tl->id(),
       'created' => [
         'value' => $created,
       ],
@@ -199,10 +199,10 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
         'format' => 'full_html',
       ],
       'field_test_entity_reference' => [
-        'target_id' => $target_entity->id(),
+        'target_id' => $target_entity_tl->id(),
       ],
     ];
-    
+
     $valores = [
       'name' => 'En Castellano de Chile',
       'field_test_text' => [
@@ -210,19 +210,18 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
         'format' => 'full_html',
       ],
       'field_test_entity_reference' => [
-        'target_id' => $target_entity->id(),
+        'target_id' => $target_entity_tl->id(),
       ],
     ];
 
-    $entity = EntityTest::create($values);
-    $entity->save();
-    $existing_entity_values = $entity->toArray();
-    
-    // Note: Drupal also generates a new date create and author 
+    $entity_tl = EntityTest::create($values);
+    $entity_tl->save();
+    $existing_entity_values = $entity_tl->toArray();
+
+    // Note: Drupal also generates a new date create and author
     // When translating but we can't mark that with @language
-    
-    $translated_entity_array = array_merge($existing_entity_values , $valores);
-    $entity->addTranslation('es', $translated_entity_array)->save();
+    $translated_entity_array = array_merge($existing_entity_values, $valores);
+    $entity_tl->addTranslation('es', $translated_entity_array)->save();
 
     $expected = [
       "@graph" => [
@@ -256,12 +255,12 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
               "@language" => "es",
             ],
           ],
-          "http://schema.org/author" => [
+          "http://schema.org/contributor" => [
             [
-              "@id" => $this->getEntityUri($target_user),
+              "@id" => $this->getEntityUri($target_user_tl),
             ],
             [
-              "@id" => $this->getEntityUri($target_user),
+              "@id" => $this->getEntityUri($target_user_tl),
             ],
           ],
           "http://schema.org/dateCreated" => [
@@ -276,11 +275,11 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
           ],
         ],
         [
-          "@id" => $this->getEntityUri($target_user),
+          "@id" => $this->getEntityUri($target_user_tl),
           "@type" => "http://localhost/rest/type/user/user",
         ],
         [
-          "@id" => $this->getEntityUri($target_entity),
+          "@id" => $this->getEntityUri($target_entity_tl),
           "@type" => [
             "http://schema.org/ImageObject",
           ],
@@ -288,7 +287,7 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
       ],
     ];
 
-    $normalized = $this->serializer->normalize($entity, $this->format);
+    $normalized = $this->serializer->normalize($entity_tl, $this->format);
 
     $this->assertEquals($expected, $normalized, "Did not normalize correctly.");
 

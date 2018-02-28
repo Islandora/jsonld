@@ -117,7 +117,7 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
     $entity->save();
     $existing_entity_values = $entity->toArray();
     $translated_entity_array = array_merge($existing_entity_values , $valores);
-    $entity->addTranslation('es-cl', $translated_entity_array)->save();
+    $entity->addTranslation('es', $translated_entity_array)->save();
 
     $expected = [
       "@graph" => [
@@ -134,21 +134,21 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
           "http://purl.org/dc/terms/description" => [
             [
               "@value" => "Dude",
-              "@language" => "en-ca",
+              "@language" => "en",
             ],
             [
               "@value" => "Muchacho",
-              "@language" => "es-cl",
+              "@language" => "es",
             ],
           ],
           "http://purl.org/dc/terms/title" => [
             [
               "@value" => "In Canadian english",
-              "@language" => "en-ca",
+              "@language" => "en",
             ],
             [
               "@value" => "En español de Chile",
-              "@language" => "es-cl",
+              "@language" => "es",
             ],
           ],
           "http://schema.org/author" => [

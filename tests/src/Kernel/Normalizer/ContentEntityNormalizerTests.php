@@ -232,7 +232,7 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
           ],
           "http://purl.org/dc/terms/references" => [
             [
-              "@id" => $this->getEntityUri($target_entity),
+              "@id" => $this->getEntityUri($target_entity_tl),
             ],
           ],
           "http://purl.org/dc/terms/description" => [

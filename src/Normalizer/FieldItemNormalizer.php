@@ -66,7 +66,9 @@ class FieldItemNormalizer extends NormalizerBase {
 
         // Getting rid of @type to allow @language
         // @see https://json-ld.org/spec/latest/json-ld/#string-internationalization
+        print_r("current_entity_rdf_mapping");
         print_r($field_mappings);
+        
         if (!empty($field_mappings['datatype'])
           && $field_mappings['datatype'] != "xsd:string"
           &&  $field_mappings['datatype'] != "http://www.w3.org/2001/XMLSchema#string") {

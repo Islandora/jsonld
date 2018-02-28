@@ -122,8 +122,6 @@ class FieldItemNormalizer extends NormalizerBase {
         }
         $normalized[$field_name] = [$values_clean];
       }
-      print_r($normalized);
-
       return $normalized;
     }
   }

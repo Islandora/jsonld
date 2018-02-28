@@ -90,6 +90,7 @@ class FieldItemNormalizer extends NormalizerBase {
           $field->getFieldDefinition(),
           $context['namespaces']
         );
+        print_r("my computed context");
         print_r($field_context);
         if (isset($field_context[$field_keys[0]])) {
           $values_clean = $values_clean + $field_context[$field_keys[0]];

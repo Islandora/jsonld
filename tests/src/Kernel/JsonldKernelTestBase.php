@@ -19,6 +19,7 @@ use Drupal\serialization\EntityResolver\ChainEntityResolver;
 use Drupal\serialization\EntityResolver\TargetIdResolver;
 use Drupal\serialization\EntityResolver\UuidResolver;
 use Symfony\Component\Serializer\Serializer;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Base class for Json-LD Kernel tests.
@@ -40,6 +41,8 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
     'entity_test',
     'text',
     'jsonld',
+    'language',
+    'content_translation',
   ];
 
   /**
@@ -75,8 +78,17 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
     $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
+
+    // Create the default languages.
+    $this->installConfig(['language']);
+    $this->installEntitySchema('configurable_language');
+
+    // Create test languages.
+    ConfigurableLanguage::createFromLangcode('es')->save();
+
     $class = get_class($this);
     while ($class) {
       if (property_exists($class, 'modules')) {
@@ -127,7 +139,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
       'entity_type' => 'entity_test',
       'field_name' => 'field_test_text',
       'bundle' => 'entity_test',
-      'translatable' => FALSE,
+      'translatable' => TRUE,
     ])->save();
 
     // Create the test entity reference field.
@@ -135,6 +147,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
       'field_name' => 'field_test_entity_reference',
       'entity_type' => 'entity_test',
       'type' => 'entity_reference',
+      'translatable' => FALSE,
       'settings' => [
         'target_type' => 'entity_test',
       ],

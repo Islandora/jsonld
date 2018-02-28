@@ -16,7 +16,6 @@ use Drupal\KernelTests\KernelTestBase;
 class JsonldContextGeneratorTest extends KernelTestBase {
 
   public static $modules = [
-    'entity',
     'entity_test',
     'hal',
     'jsonld',
@@ -24,7 +23,6 @@ class JsonldContextGeneratorTest extends KernelTestBase {
     'rdf_test_namespaces',
     'serialization',
     'system',
-    'typed_data',
   ];
 
 

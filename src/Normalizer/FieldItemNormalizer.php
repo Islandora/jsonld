@@ -64,14 +64,7 @@ class FieldItemNormalizer extends NormalizerBase {
         $field_mappings = $context['current_entity_rdf_mapping']->getPreparedFieldMapping($field->getName());
         $field_keys = isset($field_mappings['properties']) ? $field_mappings['properties'] : [$field->getName()];
 
-        // Getting rid of @type to allow @language
-        // @see https://json-ld.org/spec/latest/json-ld/#string-internationalization
-        print_r("current_entity_rdf_mapping");
-        print_r($field_mappings);
-        
-        if (!empty($field_mappings['datatype'])
-          && $field_mappings['datatype'] != "xsd:string"
-          &&  $field_mappings['datatype'] != "http://www.w3.org/2001/XMLSchema#string") {
+        if (!empty($field_mappings['datatype'])) {
           $values_clean['@type'] = $field_mappings['datatype'];
         }
 
@@ -90,8 +83,7 @@ class FieldItemNormalizer extends NormalizerBase {
           $field->getFieldDefinition(),
           $context['namespaces']
         );
-        print_r("my computed context");
-        print_r($field_context);
+
         if (isset($field_context[$field_keys[0]])) {
           $values_clean = $values_clean + $field_context[$field_keys[0]];
         }
@@ -100,12 +92,22 @@ class FieldItemNormalizer extends NormalizerBase {
       else {
         $field_keys = [$field->getName()];
       }
-      print_r($field_keys);
+
       // JSON-LD Spec says you can't have an @language for a typed values.
-      if (isset($context['langcode']) && !isset($values_clean['@type'])) {
+      if (isset($context['langcode']) &&
+      (!isset($values_clean['@type']) ||
+      empty($values_clean['@type']) ||
+      $values_clean['@type'] == "xsd:string" ||
+      $values_clean['@type'] == "http://www.w3.org/2001/XMLSchema#string")) {
+        // @see https://json-ld.org/spec/latest/json-ld/#dfn-strings.
+        // Getting rid of @type to allow @language.
+        // @see https://json-ld.org/spec/latest/json-ld/#string-internationalization.
+        unset($values_clean['@type']);
         $values_clean['@language'] = $context['langcode'];
       }
+
       array_filter($values_clean);
+
       // The values are wrapped in an array, and then wrapped in another array
       // keyed by field name so that field items can be merged by the
       // FieldNormalizer.

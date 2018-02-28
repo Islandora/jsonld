@@ -184,8 +184,8 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
     $created_iso = $dt->format(\DateTime::W3C);
     // Create an entity.
     $values = [
-      'langcode' => 'en-ca',
-      'name' => 'In english',
+      'langcode' => 'en',
+      'name' => 'In Canadian english',
       'type' => 'entity_test',
       'bundle' => 'entity_test',
       'user_id' => $target_user->id(),
@@ -202,7 +202,7 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
     ];
     
     $valores = [
-      'name' => 'En español',
+      'name' => 'En Castellano de Chile',
       'field_test_text' => [
         'value' => 'Muchacho',
         'format' => 'full_html',
@@ -246,7 +246,7 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
               "@language" => "en",
             ],
             [
-              "@value" => "En español de Chile",
+              "@value" => "En Castellano de Chile",
               "@language" => "es",
             ],
           ],

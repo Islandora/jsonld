@@ -217,6 +217,10 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
     $entity = EntityTest::create($values);
     $entity->save();
     $existing_entity_values = $entity->toArray();
+    
+    // Note: Drupal also generates a new date create and author 
+    // When translating but we can't mark that with @language
+    
     $translated_entity_array = array_merge($existing_entity_values , $valores);
     $entity->addTranslation('es', $translated_entity_array)->save();
 
@@ -256,8 +260,15 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
             [
               "@id" => $this->getEntityUri($target_user),
             ],
+            [
+              "@id" => $this->getEntityUri($target_user),
+            ],
           ],
           "http://schema.org/dateCreated" => [
+            [
+              "@type" => "http://www.w3.org/2001/XMLSchema#dateTime",
+              "@value" => $created_iso,
+            ],
             [
               "@type" => "http://www.w3.org/2001/XMLSchema#dateTime",
               "@value" => $created_iso,
@@ -278,7 +289,7 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
     ];
 
     $normalized = $this->serializer->normalize($entity, $this->format);
-    print_r($normalized);
+
     $this->assertEquals($expected, $normalized, "Did not normalize correctly.");
 
   }

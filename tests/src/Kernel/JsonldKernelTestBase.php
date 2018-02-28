@@ -19,6 +19,9 @@ use Drupal\serialization\EntityResolver\ChainEntityResolver;
 use Drupal\serialization\EntityResolver\TargetIdResolver;
 use Drupal\serialization\EntityResolver\UuidResolver;
 use Symfony\Component\Serializer\Serializer;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\TypedData\TranslationStatusInterface;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Base class for Json-LD Kernel tests.

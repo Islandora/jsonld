@@ -226,7 +226,7 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
     $expected = [
       "@graph" => [
         [
-          "@id" => $this->getEntityUri($entity),
+          "@id" => $this->getEntityUri($entity_tl),
           "@type" => [
             'http://schema.org/ImageObject',
           ],

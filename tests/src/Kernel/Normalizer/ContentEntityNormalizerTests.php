@@ -102,11 +102,13 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
           "http://purl.org/dc/terms/description" => [
             [
               "@value" => $values['field_test_text']['value'],
+              "@language" => "en",
             ],
           ],
           "http://purl.org/dc/terms/title" => [
             [
               "@value" => $values['name'],
+              "@language" => "en",
             ],
           ],
           "http://schema.org/author" => [

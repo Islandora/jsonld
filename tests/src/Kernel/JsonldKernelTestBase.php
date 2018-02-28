@@ -149,6 +149,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
       'field_name' => 'field_test_entity_reference',
       'entity_type' => 'entity_test',
       'type' => 'entity_reference',
+      'translatable' => FALSE,
       'settings' => [
         'target_type' => 'entity_test',
       ],

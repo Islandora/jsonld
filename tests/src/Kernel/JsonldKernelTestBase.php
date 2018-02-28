@@ -42,6 +42,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
     'entity_test',
     'text',
     'jsonld',
+    'language',
   ];
 
   /**
@@ -71,14 +72,48 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
    * @var \Drupal\rdf\Entity\RdfMapping
    */
   protected $rdfMapping;
+  
+  /**
+   * The language manager service.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+  * The available language codes.
+  *
+  * @var array
+  */
+  protected $langcodes;
+  
 
   /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
+    $this->languageManager = $this->container->get('language_manager');
     $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
+    
+    // Create the default languages.
+    $this->installConfig(['language']);
+
+    // Create test languages.
+    $this->langcodes = ['en-ca','es-cl'];
+    foreach ($this->langcodes as $key => $fakelang) {
+      $language = ConfigurableLanguage::create([
+        'id' => $fakelang,
+        'label' => $fakelang,
+        'weight' => $key,
+      ]);
+      $this->langcodes[$key] = $language->getId();
+      $language->save();
+    }
+
+    $this->state->set('entity_test.translation', TRUE);
+
     $class = get_class($this);
     while ($class) {
       if (property_exists($class, 'modules')) {
@@ -129,7 +164,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
       'entity_type' => 'entity_test',
       'field_name' => 'field_test_text',
       'bundle' => 'entity_test',
-      'translatable' => FALSE,
+      'translatable' => TRUE,
     ])->save();
 
     // Create the test entity reference field.

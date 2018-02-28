@@ -85,7 +85,7 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
     $created_iso = $dt->format(\DateTime::W3C);
     // Create an entity.
     $values = [
-      'langcode' => 'en',
+      'langcode' => 'en-ca',
       'name' => 'In english',
       'type' => 'entity_test',
       'bundle' => 'entity_test',
@@ -117,7 +117,7 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
     $entity->save();
     $existing_entity_values = $entity->toArray();
     $translated_entity_array = array_merge($existing_entity_values , $valores);
-    $entity->addTranslation('es', $translated_entity_array)->save();
+    $entity->addTranslation('es-cl', $translated_entity_array)->save();
 
     $expected = [
       "@graph" => [
@@ -134,21 +134,21 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
           "http://purl.org/dc/terms/description" => [
             [
               "@value" => "Dude",
-              "@language" => "en",
+              "@language" => "en-ca",
             ],
             [
               "@value" => "Muchacho",
-              "@language" => "es",
+              "@language" => "es-cl",
             ],
           ],
           "http://purl.org/dc/terms/title" => [
             [
-              "@value" => "In english",
-              "@language" => "en",
+              "@value" => "In Canadian english",
+              "@language" => "en-ca",
             ],
             [
-              "@value" => "En español",
-              "@language" => "es",
+              "@value" => "En español de Chile",
+              "@language" => "es-cl",
             ],
           ],
           "http://schema.org/author" => [

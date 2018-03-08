@@ -55,7 +55,7 @@ abstract class NormalizerBase extends SerializationNormalizerBase implements Den
    * @return string
    *   The predicate with escaped namespace prefix.
    */
-  protected function escapePrefix($predicate, array $namespaces) {
+  public static function escapePrefix($predicate, array $namespaces) {
 
     $exploded = explode(":", $predicate);
     if (!isset($namespaces[$exploded[0]])) {

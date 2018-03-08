@@ -3,7 +3,7 @@
 namespace Drupal\jsonld\Normalizer;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -12,6 +12,8 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  * Converts the Drupal entity object structure to a JSON-LD array structure.
  */
 class ContentEntityNormalizer extends NormalizerBase {
+
+  const NORMALIZE_ALTER_HOOK = "jsonld_alter_normalized_array";
 
   /**
    * The interface or class that this Normalizer supports.
@@ -46,12 +48,12 @@ class ContentEntityNormalizer extends NormalizerBase {
    *
    * @param \Drupal\hal\LinkManager\LinkManagerInterface $link_manager
    *   The hypermedia link manager.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
    *   The entity manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    */
-  public function __construct(LinkManagerInterface $link_manager, EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler) {
+  public function __construct(LinkManagerInterface $link_manager, EntityTypeManagerInterface $entity_manager, ModuleHandlerInterface $module_handler) {
 
     $this->linkManager = $link_manager;
     $this->entityManager = $entity_manager;
@@ -67,12 +69,17 @@ class ContentEntityNormalizer extends NormalizerBase {
     // @TODO check $format before going RDF crazy
     $normalized = [];
 
+    if (isset($context['depth'])) {
+      $context['depth'] += 1;
+    }
+
     $context += [
       'account' => NULL,
       'included_fields' => NULL,
       'needs_jsonldcontext' => FALSE,
       'embedded' => FALSE,
       'namespaces' => rdf_get_namespaces(),
+      'depth' => 0,
     ];
 
     if ($context['needs_jsonldcontext']) {
@@ -95,7 +102,7 @@ class ContentEntityNormalizer extends NormalizerBase {
     // not shortened ones. So we replace them in place.
     if ($context['needs_jsonldcontext'] === FALSE && is_array($types)) {
       for ($i = 0; $i < count($types); $i++) {
-        $types[$i] = $this->escapePrefix($types[$i], $context['namespaces']);
+        $types[$i] = ContentEntityNormalizer::escapePrefix($types[$i], $context['namespaces']);
       }
     }
 
@@ -126,6 +133,7 @@ class ContentEntityNormalizer extends NormalizerBase {
 
     $context['current_entity_id'] = $this->getEntityUri($entity);
     $context['current_entity_rdf_mapping'] = $rdf_mappings;
+
     foreach ($fields as $name => $field) {
       // Just process fields that have rdf mappings defined.
       // We could also pass as not contextualized keys the others
@@ -149,6 +157,12 @@ class ContentEntityNormalizer extends NormalizerBase {
     // by converting from associative to numeric indexed.
     if (!$context['embedded']) {
       $normalized['@graph'] = array_values($normalized['@graph']);
+    }
+
+    if (isset($context['depth']) && $context['depth'] == 0) {
+      $this->moduleHandler->invokeAll(self::NORMALIZE_ALTER_HOOK,
+        [$entity, &$normalized, $context]
+      );
     }
     return $normalized;
   }
@@ -238,9 +252,9 @@ class ContentEntityNormalizer extends NormalizerBase {
     // Some entity types don't provide a canonical link template, at least call
     // out to ->url().
     if ($entity->isNew() || !$entity->hasLinkTemplate('canonical')) {
-      return $entity->url('canonical', []);
+      return $entity->toUrl('canonical', []);
     }
-    $url = $entity->urlInfo('canonical', ['absolute' => TRUE]);
+    $url = $entity->toUrl('canonical', ['absolute' => TRUE]);
     return $url->setRouteParameter('_format', 'jsonld')->toString();
   }
 

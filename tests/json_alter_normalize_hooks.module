@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * A test module to implement the hooks to be tested.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_jsonld_alter_normalized_array().
+ */
+function json_alter_normalize_hooks_jsonld_alter_normalized_array(EntityInterface $entity, array &$normalized, array $context) {
+  if (isset($normalized['@graph'])) {
+    if (!is_array($normalized['@graph'])) {
+      $normalized['@graph'] = [
+        [$normalized['@graph']],
+      ];
+    }
+    $normalized['@graph'][] = [
+      '@id' => 'json_alter_normalize_hooks',
+      'http://purl.org/dc/elements/1.1/title' => 'The hook is tested.',
+    ];
+  }
+}

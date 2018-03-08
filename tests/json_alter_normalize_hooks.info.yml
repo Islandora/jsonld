@@ -1,0 +1,6 @@
+name: 'Jsonld hook tests'
+type: module
+package: Testing
+core: 8.x
+dependencies:
+  - jsonld

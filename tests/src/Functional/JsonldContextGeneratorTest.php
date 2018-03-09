@@ -3,8 +3,6 @@
 namespace Drupal\Tests\jsonld\Functional;
 
 use Drupal\Core\Url;
-use Drupal\node\Entity\NodeType;
-use Drupal\rdf\Entity\RdfMapping;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -88,16 +86,17 @@ class JsonldContextGeneratorTest extends BrowserTestBase {
    * Tests that the Context received has the basic structural needs.
    */
   public function testJsonldcontextResponseIsValid() {
-    $expected = ['@context' => [
-      'schema' => 'http://schema.org/',
-      'dc' => 'http://purl.org/dc/terms/',
-      'schema:dateCreated' => [
-        '@type' => "xsd:dateTime",
+    $expected = [
+      '@context' => [
+        'schema' => 'http://schema.org/',
+        'dc' => 'http://purl.org/dc/terms/',
+        'schema:dateCreated' => [
+          '@type' => "xsd:dateTime",
+        ],
+        'dc:title' => [
+          '@type' => 'xsd:string',
+        ],
       ],
-      'dc:title' => [
-        '@type' => 'xsd:string',
-      ],
-    ],
     ];
 
     $url = Url::fromRoute('jsonld.context', ['entity_type' => 'node', 'bundle' => 'test_type']);

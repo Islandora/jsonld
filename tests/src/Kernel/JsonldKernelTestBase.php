@@ -214,6 +214,8 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
       'langcode' => 'en',
       'field_test_entity_reference' => NULL,
     ]);
+    $target_entity->getFieldDefinition('created')->setTranslatable(FALSE);
+    $target_entity->getFieldDefinition('user_id')->setTranslatable(FALSE);
     $target_entity->save();
 
     $target_user = User::create([
@@ -276,13 +278,13 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
           ],
           "http://purl.org/dc/terms/description" => [
             [
-              "@type" => "http://www.w3.org/2001/XMLSchema#string",
               "@value" => $values['field_test_text']['value'],
+              "@language" => "en",
             ],
           ],
           "http://purl.org/dc/terms/title" => [
             [
-              "@type" => "http://www.w3.org/2001/XMLSchema#string",
+              "@language" => "en",
               "@value" => $values['name'],
             ],
           ],

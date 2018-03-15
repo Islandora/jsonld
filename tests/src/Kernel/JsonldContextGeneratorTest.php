@@ -25,7 +25,6 @@ class JsonldContextGeneratorTest extends KernelTestBase {
     'system',
   ];
 
-
   /**
    * The entity manager service.
    *

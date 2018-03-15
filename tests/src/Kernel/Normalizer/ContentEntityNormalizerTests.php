@@ -32,7 +32,6 @@ class ContentEntityNormalizerTests extends JsonldKernelTestBase {
    */
   public function testSimpleNormalizeJsonld() {
 
-
     list($entity, $expected) = $this->generateTestEntity();
 
     $normalized = $this->serializer->normalize($entity, $this->format);

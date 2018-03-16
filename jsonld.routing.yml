@@ -1,0 +1,7 @@
+# JSON-LD Context Routing definition
+jsonld.context:
+  path: '/jsonld/context/{entity_type}/{bundle}'
+  defaults:
+    _controller: '\Drupal\jsonld\Controller\JsonldContextController::content'
+  requirements:
+     _permission: 'access content'

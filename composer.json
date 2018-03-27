@@ -20,5 +20,7 @@
             "role": "Maintainer"
         }
     ],
-    "require": {}
+    "require": {
+        "ml/json-ld": "1.*"
+    }
 }

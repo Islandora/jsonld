@@ -50,12 +50,14 @@ class FieldItemNormalizer extends NormalizerBase {
     $values_clean = [];
     $normalized = [];
     $field = $field_item->getParent();
-    if (!isset($values['value'])) {
-      // Makes little sense to add to json-ld without a value.
+
+    if (!isset($values['value']) && !isset($values['uri'])) {
+      // Makes little sense to add to json-ld without a value or uri.
       return [];
     }
     else {
-      $values_clean['@value'] = $values['value'];
+      // Set the uri here, and then convert it to '@id' later on.
+      $values_clean['@value'] = isset($values['value']) ? $values['value'] : $values['uri'];
       if (isset($context['current_entity_rdf_mapping'])) {
         // So why i am passing the whole rdf mapping object and not
         // only the predicate? Well because i hope i will be able
@@ -107,6 +109,13 @@ class FieldItemNormalizer extends NormalizerBase {
       }
 
       array_filter($values_clean);
+
+      // Convert @value to @id if the item we're normalizing is a Link.
+      if (isset($values['uri'])) {
+        $values_clean['@id'] = $values_clean['@value'];
+        unset($values_clean['@value']);
+        unset($values_clean['@type']);
+      }
 
       // The values are wrapped in an array, and then wrapped in another array
       // keyed by field name so that field items can be merged by the

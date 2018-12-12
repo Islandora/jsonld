@@ -26,6 +26,11 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
    */
   const CACHE_BASE_CID = 'jsonld:context';
 
+  /**
+   * Constant hook alter name
+   */
+  const FIELD_TYPE_ALTER_HOOK = 'jsonld_alter_field_mappings';
+
 
   /**
    * Injected EntityFieldManager.
@@ -317,93 +322,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
       "@type" => "xsd:string",
     ];
 
-    $field_mappings = [
-      "comment" => [
-        "@type" => "xsd:string",
-      ],
-      "datetime" => [
-        "@type" => "xsd:dateTime",
-      ],
-      "file" => [
-        "@type" => "@id",
-      ],
-      "image" => [
-        "@type" => "@id",
-      ],
-      "link" => [
-        "@type" => "xsd:anyURI",
-      ],
-      "list_float" => [
-        "@type" => "xsd:float",
-        "@container" => "@list",
-      ],
-      "list_integer" => [
-        "@type" => "xsd:int",
-        "@container" => "@list",
-      ],
-      "list_string" => [
-        "@type" => "xsd:string",
-        "@container" => "@list",
-      ],
-      "path" => [
-        "@type" => "xsd:anyURI",
-      ],
-      "text" => [
-        "@type" => "xsd:string",
-      ],
-      "text_with_summary" => [
-        "@type" => "xsd:string",
-      ],
-      "text_long" => [
-        "@type" => "xsd:string",
-      ],
-      "uuid" => [
-        "@type" => "xsd:string",
-      ],
-      "uri" => [
-        "@type" => "xsd:anyURI",
-      ],
-      "language" => [
-        "@type" => "xsd:language",
-      ],
-      "string_long" => [
-        "@type" => "xsd:string",
-      ],
-      "changed" => [
-        "@type" => "xsd:dateTime",
-      ],
-      "map" => "xsd:",
-      "boolean" => [
-        "@type" => "xsd:boolean",
-      ],
-      "email" => [
-        "@type" => "xsd:string",
-      ],
-      "integer" => [
-        "@type" => "xsd:int",
-      ],
-      "decimal" => [
-        "@type" => "xsd:decimal",
-      ],
-      "created" => [
-        "@type" => "xsd:dateTime",
-      ],
-      "float" => [
-        "@type" => "xsd:float",
-      ],
-      "entity_reference" => [
-        "@type" => "@id",
-      ],
-      "timestamp" => [
-        "@type" => "xsd:dateTime",
-      ],
-      "string" => [
-        "@type" => "xsd:string",
-      ],
-      "password" => [
-        "@type" => "xsd:string",
-      ],
-    ];
+    $field_mappings = \Drupal::moduleHandler()->invokeAll('jsonld_alter_field_mappings', []);
 
     return array_key_exists($field_type, $field_mappings) ? $field_mappings[$field_type] : $default_mapping;
 

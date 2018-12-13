@@ -27,7 +27,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
   const CACHE_BASE_CID = 'jsonld:context';
 
   /**
-   * Constant hook alter name
+   * Constant hook alter name.
    */
   const FIELD_TYPE_ALTER_HOOK = 'jsonld_alter_field_mappings';
 

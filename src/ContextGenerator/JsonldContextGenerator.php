@@ -69,6 +69,13 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
   protected $logger;
 
   /**
+   * Cached field type mappings.
+   *
+   * @var array
+   */
+  protected $fieldMappings = [];
+
+  /**
    * Constructs a ContextGenerator object.
    *
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
@@ -322,10 +329,29 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
       "@type" => "xsd:string",
     ];
 
-    $field_mappings = \Drupal::moduleHandler()->invokeAll('jsonld_alter_field_mappings', []);
-
-    return array_key_exists($field_type, $field_mappings) ? $field_mappings[$field_type] : $default_mapping;
-
+    // Only load mappings from hooks if we haven't done it
+    // yet for this instance.
+    if (empty($this->fieldMappings)) {
+      // Cribbed from rdf module's rdf_get_namespaces.
+      foreach (\Drupal::moduleHandler()->getImplementations('jsonld_alter_field_mappings') as $module) {
+        $function = $module . '_jsonld_alter_field_mappings';
+        foreach ($function() as $field => $mapping) {
+          if (array_key_exists($field, $this->fieldMappings)) {
+            $this->logger->warning(
+              t('Tried to map @field_type to @new_type, but @field_type is already mapped to @orig_type.', [
+                '@field_type' => $field,
+                '@new_type' => $mapping['@type'],
+                '@orig_type' => $this->fieldMappings[$field]['@type'],
+              ])
+            );
+          }
+          else {
+            $this->fieldMappings[$field] = $mapping;
+          }
+        }
+      }
+    }
+    return array_key_exists($field_type, $this->fieldMappings) ? $this->fieldMappings[$field_type] : $default_mapping;
   }
 
 }

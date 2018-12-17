@@ -29,7 +29,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
   /**
    * Constant hook alter name.
    */
-  const FIELD_TYPE_ALTER_HOOK = 'jsonld_alter_field_mappings';
+  const FIELD_TYPE_ALTER_HOOK = 'jsonld_field_mappings_alter';
 
 
   /**
@@ -333,8 +333,8 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
     // yet for this instance.
     if (empty($this->fieldMappings)) {
       // Cribbed from rdf module's rdf_get_namespaces.
-      foreach (\Drupal::moduleHandler()->getImplementations('jsonld_alter_field_mappings') as $module) {
-        $function = $module . '_jsonld_alter_field_mappings';
+      foreach (\Drupal::moduleHandler()->getImplementations('jsonld_field_mappings_alter') as $module) {
+        $function = $module . '_jsonld_field_mappings_alter';
         foreach ($function() as $field => $mapping) {
           if (array_key_exists($field, $this->fieldMappings)) {
             $this->logger->warning(

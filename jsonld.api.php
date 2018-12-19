@@ -43,7 +43,7 @@ function hook_jsonld_alter_normalized_array(EntityInterface $entity, array &$nor
  *   An associative array of field type mappings where the key is the field type
  *   and the value is the type mapping.
  */
-function hook_jsonld_field_mappings_alter() {
+function hook_jsonld_field_mappings() {
   return [
     "string" => [
       "@type" => "xsd:string",

@@ -22,9 +22,9 @@ function jsonld_help($route_name, RouteMatchInterface $route_match) {
 }
 
 /**
- * Implements hook_jsonld_field_mappings_alter().
+ * Implements hook_jsonld_field_mappings().
  */
-function jsonld_jsonld_field_mappings_alter() {
+function jsonld_jsonld_field_mappings() {
   return [
     "comment" => [
       "@type" => "xsd:string",

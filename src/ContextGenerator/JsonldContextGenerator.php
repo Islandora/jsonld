@@ -26,6 +26,11 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
    */
   const CACHE_BASE_CID = 'jsonld:context';
 
+  /**
+   * Constant hook alter name.
+   */
+  const FIELD_MAPPPINGS_HOOK = 'jsonld_field_mappings';
+
 
   /**
    * Injected EntityFieldManager.
@@ -62,6 +67,13 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
    *   A logger instance.
    */
   protected $logger;
+
+  /**
+   * Cached field type mappings.
+   *
+   * @var array
+   */
+  protected $fieldMappings = [];
 
   /**
    * Constructs a ContextGenerator object.
@@ -317,96 +329,29 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
       "@type" => "xsd:string",
     ];
 
-    $field_mappings = [
-      "comment" => [
-        "@type" => "xsd:string",
-      ],
-      "datetime" => [
-        "@type" => "xsd:dateTime",
-      ],
-      "file" => [
-        "@type" => "@id",
-      ],
-      "image" => [
-        "@type" => "@id",
-      ],
-      "link" => [
-        "@type" => "xsd:anyURI",
-      ],
-      "list_float" => [
-        "@type" => "xsd:float",
-        "@container" => "@list",
-      ],
-      "list_integer" => [
-        "@type" => "xsd:int",
-        "@container" => "@list",
-      ],
-      "list_string" => [
-        "@type" => "xsd:string",
-        "@container" => "@list",
-      ],
-      "path" => [
-        "@type" => "xsd:anyURI",
-      ],
-      "text" => [
-        "@type" => "xsd:string",
-      ],
-      "text_with_summary" => [
-        "@type" => "xsd:string",
-      ],
-      "text_long" => [
-        "@type" => "xsd:string",
-      ],
-      "uuid" => [
-        "@type" => "xsd:string",
-      ],
-      "uri" => [
-        "@type" => "xsd:anyURI",
-      ],
-      "language" => [
-        "@type" => "xsd:language",
-      ],
-      "string_long" => [
-        "@type" => "xsd:string",
-      ],
-      "changed" => [
-        "@type" => "xsd:dateTime",
-      ],
-      "map" => "xsd:",
-      "boolean" => [
-        "@type" => "xsd:boolean",
-      ],
-      "email" => [
-        "@type" => "xsd:string",
-      ],
-      "integer" => [
-        "@type" => "xsd:int",
-      ],
-      "decimal" => [
-        "@type" => "xsd:decimal",
-      ],
-      "created" => [
-        "@type" => "xsd:dateTime",
-      ],
-      "float" => [
-        "@type" => "xsd:float",
-      ],
-      "entity_reference" => [
-        "@type" => "@id",
-      ],
-      "timestamp" => [
-        "@type" => "xsd:dateTime",
-      ],
-      "string" => [
-        "@type" => "xsd:string",
-      ],
-      "password" => [
-        "@type" => "xsd:string",
-      ],
-    ];
-
-    return array_key_exists($field_type, $field_mappings) ? $field_mappings[$field_type] : $default_mapping;
-
+    // Only load mappings from hooks if we haven't done it
+    // yet for this instance.
+    if (empty($this->fieldMappings)) {
+      // Cribbed from rdf module's rdf_get_namespaces.
+      foreach (\Drupal::moduleHandler()->getImplementations(self::FIELD_MAPPPINGS_HOOK) as $module) {
+        $function = $module . '_' . self::FIELD_MAPPPINGS_HOOK;
+        foreach ($function() as $field => $mapping) {
+          if (array_key_exists($field, $this->fieldMappings)) {
+            $this->logger->warning(
+              t('Tried to map @field_type to @new_type, but @field_type is already mapped to @orig_type.', [
+                '@field_type' => $field,
+                '@new_type' => $mapping['@type'],
+                '@orig_type' => $this->fieldMappings[$field]['@type'],
+              ])
+            );
+          }
+          else {
+            $this->fieldMappings[$field] = $mapping;
+          }
+        }
+      }
+    }
+    return array_key_exists($field_type, $this->fieldMappings) ? $this->fieldMappings[$field_type] : $default_mapping;
   }
 
 }

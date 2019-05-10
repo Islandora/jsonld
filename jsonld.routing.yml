@@ -5,3 +5,12 @@ jsonld.context:
     _controller: '\Drupal\jsonld\Controller\JsonldContextController::content'
   requirements:
      _permission: 'access content'
+
+# Core Jsonld configuration form
+system.jsonld_settings:
+  path: '/admin/config/search/jsonld'
+  defaults:
+    _form: '\Drupal\jsonld\Form\JsonLdSettingsForm'
+    _title: 'JsonLD Settings'
+  requirements:
+    _permission: 'administer site configuration'

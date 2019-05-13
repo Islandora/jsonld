@@ -170,7 +170,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
 
     // Set up the mock serializer.
     $normalizers = [
-      new ContentEntityNormalizer($link_manager, $entity_manager, \Drupal::moduleHandler()),
+      new ContentEntityNormalizer($link_manager, $entity_manager, \Drupal::moduleHandler(),  \Drupal::service('config.factory')),
       new EntityReferenceItemNormalizer($link_manager, $chain_resolver, $jsonld_context_generator),
       new FieldItemNormalizer($jsonld_context_generator),
       new FieldNormalizer(),
@@ -190,6 +190,9 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
    *
    * @return string
    *   The entity URI.
+   *
+   * @throws \Drupal\Core\Entity\EntityMalformedException
+   *   The toUrl() call fails.
    */
   protected function getEntityUri(EntityInterface $entity) {
 
@@ -207,6 +210,11 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
    *
    * @return array
    *   with [ the entity, the normalized array ].
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   *   Problem saving the entity.
+   * @throws \Exception
+   *   Problem creating a DateTime.
    */
   protected function generateTestEntity() {
     $target_entity = EntityTest::create([

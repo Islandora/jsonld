@@ -170,7 +170,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
 
     // Set up the mock serializer.
     $normalizers = [
-      new ContentEntityNormalizer($link_manager, $entity_manager, \Drupal::moduleHandler(),  \Drupal::service('config.factory')),
+      new ContentEntityNormalizer($link_manager, $entity_manager, \Drupal::moduleHandler(), \Drupal::service('config.factory')),
       new EntityReferenceItemNormalizer($link_manager, $chain_resolver, $jsonld_context_generator),
       new FieldItemNormalizer($jsonld_context_generator),
       new FieldNormalizer(),

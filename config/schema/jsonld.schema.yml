@@ -3,5 +3,5 @@ jsonld.settings:
   label: 'JSONLD Settings'
   mapping:
     remove_jsonld_format:
-      type: bool 
+      type: boolean 
       label: 'If checked, ?_format=jsonld will be stripped from the end of urls in JSONLD'

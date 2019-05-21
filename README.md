@@ -12,6 +12,12 @@ This module adds a simple Drupal entity to JSON-LD
 classes. It depends on RDF module and existing fields to rdf properties 
 mappings to do it's job.
 
+## Configuration
+
+The JSON-LD normalizer adds a `?_format=jsonld` to all URIs by default.
+
+You can disable this via a checkbox in the Configuration -> Search and Metadata -> JsonLD form.
+
 ## Maintainers
 
 Current maintainers:

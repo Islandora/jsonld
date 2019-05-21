@@ -2,10 +2,12 @@
 
 namespace Drupal\jsonld\Normalizer;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
+use Drupal\jsonld\Form\JsonLdSettingsForm;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -44,6 +46,13 @@ class ContentEntityNormalizer extends NormalizerBase {
   protected $moduleHandler;
 
   /**
+   * The configuration.
+   *
+   * @var \Drupal\Core\Config\ImmutableConfig
+   */
+  protected $config;
+
+  /**
    * Constructs an ContentEntityNormalizer object.
    *
    * @param \Drupal\hal\LinkManager\LinkManagerInterface $link_manager
@@ -52,12 +61,18 @@ class ContentEntityNormalizer extends NormalizerBase {
    *   The entity manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The configuration factory.
    */
-  public function __construct(LinkManagerInterface $link_manager, EntityTypeManagerInterface $entity_manager, ModuleHandlerInterface $module_handler) {
+  public function __construct(LinkManagerInterface $link_manager,
+                              EntityTypeManagerInterface $entity_manager,
+                              ModuleHandlerInterface $module_handler,
+                              ConfigFactoryInterface $config_factory) {
 
     $this->linkManager = $link_manager;
     $this->entityManager = $entity_manager;
     $this->moduleHandler = $module_handler;
+    $this->config = $config_factory->get(JsonLdSettingsForm::CONFIG_NAME);
   }
 
   /**
@@ -252,10 +267,16 @@ class ContentEntityNormalizer extends NormalizerBase {
     // Some entity types don't provide a canonical link template, at least call
     // out to ->url().
     if ($entity->isNew() || !$entity->hasLinkTemplate('canonical')) {
-      return $entity->toUrl('canonical', []);
+      if ($entity->getEntityTypeId() == 'file') {
+        return $entity->url();
+      }
+      return "";
     }
     $url = $entity->toUrl('canonical', ['absolute' => TRUE]);
-    return $url->setRouteParameter('_format', 'jsonld')->toString();
+    if (!$this->config->get(JsonLdSettingsForm::REMOVE_JSONLD_FORMAT)) {
+      $url->setRouteParameter('_format', 'jsonld');
+    }
+    return $url->toString();
   }
 
   /**

@@ -2,6 +2,7 @@
 
 namespace Drupal\jsonld\Normalizer;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\FileSystemInterface;
@@ -47,14 +48,17 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
    *   The module handler.
    * @param \Drupal\Core\File\FileSystemInterface $file_system
    *   The file system handler.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The configuration factory.
    */
   public function __construct(EntityTypeManagerInterface $entity_manager,
                               ClientInterface $http_client,
                               LinkManagerInterface $link_manager,
                               ModuleHandlerInterface $module_handler,
-                              FileSystemInterface $file_system) {
+                              FileSystemInterface $file_system,
+                              ConfigFactoryInterface $config_factory) {
 
-    parent::__construct($link_manager, $entity_manager, $module_handler);
+    parent::__construct($link_manager, $entity_manager, $module_handler, $config_factory);
 
     $this->httpClient = $http_client;
     $this->fileSystem = $file_system;

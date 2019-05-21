@@ -1,0 +1,6 @@
+# Core configuration form
+system.jsonld_settings:
+  title: 'JsonLD'
+  parent: system.admin_config_search
+  route_name: system.jsonld_settings
+  description: 'Configure Jsonld settings'

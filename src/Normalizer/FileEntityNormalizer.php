@@ -6,6 +6,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
 use GuzzleHttp\ClientInterface;
 
@@ -50,15 +52,21 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
    *   The file system handler.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
+   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   *   The route provider.
    */
   public function __construct(EntityTypeManagerInterface $entity_manager,
                               ClientInterface $http_client,
                               LinkManagerInterface $link_manager,
                               ModuleHandlerInterface $module_handler,
                               FileSystemInterface $file_system,
-                              ConfigFactoryInterface $config_factory) {
+                              ConfigFactoryInterface $config_factory,
+                              LanguageManagerInterface $language_manager,
+                              RouteProviderInterface $route_provider) {
 
-    parent::__construct($link_manager, $entity_manager, $module_handler, $config_factory);
+    parent::__construct($link_manager, $entity_manager, $module_handler, $config_factory, $language_manager, $route_provider);
 
     $this->httpClient = $http_client;
     $this->fileSystem = $file_system;

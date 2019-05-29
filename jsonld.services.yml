@@ -17,10 +17,10 @@ services:
     class: Drupal\jsonld\Normalizer\FileEntityNormalizer
     tags:
       - { name: normalizer, priority: 20 }
-    arguments: ['@entity_type.manager', '@http_client', '@hal.link_manager', '@module_handler', '@file_system', '@config.factory']
+    arguments: ['@entity_type.manager', '@http_client', '@hal.link_manager', '@module_handler', '@file_system', '@config.factory', '@language_manager', '@router.route_provider']
   serializer.normalizer.entity.jsonld:
     class: Drupal\jsonld\Normalizer\ContentEntityNormalizer
-    arguments: ['@hal.link_manager', '@entity_type.manager', '@module_handler', '@config.factory']
+    arguments: ['@hal.link_manager', '@entity_type.manager', '@module_handler', '@config.factory', '@language_manager', '@router.route_provider']
     tags:
       - { name: normalizer, priority: 10 }
   serializer.encoder.jsonld:

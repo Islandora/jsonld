@@ -4,6 +4,7 @@ namespace Drupal\Tests\jsonld\Kernel;
 
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -20,6 +21,7 @@ use Drupal\serialization\EntityResolver\ChainEntityResolver;
 use Drupal\serialization\EntityResolver\TargetIdResolver;
 use Drupal\serialization\EntityResolver\UuidResolver;
 use Drupal\user\Entity\User;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Serializer\Serializer;
 use Drupal\language\Entity\ConfigurableLanguage;
 
@@ -76,10 +78,27 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
   protected $rdfMapping;
 
   /**
+   * The Language manager for our tests.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * A route provider for our tests.
+   *
+   * @var \Drupal\Core\Routing\RouteProviderInterface
+   */
+  protected $routeProvider;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
+
+    $this->languageManager = \Drupal::service('language_manager');
+    $this->routeProvider = \Drupal::service('router.route_provider');
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
@@ -170,7 +189,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
 
     // Set up the mock serializer.
     $normalizers = [
-      new ContentEntityNormalizer($link_manager, $entity_manager, \Drupal::moduleHandler(), \Drupal::service('config.factory')),
+      new ContentEntityNormalizer($link_manager, $entity_manager, \Drupal::moduleHandler(), \Drupal::service('config.factory'), $this->languageManager, $this->routeProvider),
       new EntityReferenceItemNormalizer($link_manager, $chain_resolver, $jsonld_context_generator),
       new FieldItemNormalizer($jsonld_context_generator),
       new FieldNormalizer(),
@@ -199,10 +218,31 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
     // Some entity types don't provide a canonical link template, at least call
     // out to ->url().
     if ($entity->isNew() || !$entity->hasLinkTemplate('canonical')) {
-      return $entity->toUrl('canonical', []);
+      if ($entity->getEntityTypeId() == 'file') {
+        return $entity->url();
+      }
+      return "";
     }
-    $url = $entity->toUrl('canonical', ['absolute' => TRUE]);
-    return $url->setRouteParameter('_format', 'jsonld')->toString();
+
+    try {
+      $undefined = $this->languageManager->getLanguage('und');
+      $entity_type = $entity->getEntityTypeId();
+
+      // This throws the RouteNotFoundException if the route doesn't exist.
+      $this->routeProvider->getRouteByName("rest.entity.$entity_type.GET");
+
+      $url = Url::fromRoute(
+        "rest.entity.$entity_type.GET",
+        [$entity_type => $entity->id()],
+        ['absolute' => TRUE, 'language' => $undefined]
+      );
+    }
+    catch (RouteNotFoundException $e) {
+      $url = $entity->toUrl('canonical', ['absolute' => TRUE]);
+    }
+    // We don't currently test disabling the _format=jsonld ending.
+    $url->setRouteParameter('_format', 'jsonld');
+    return $url->toString();
   }
 
   /**

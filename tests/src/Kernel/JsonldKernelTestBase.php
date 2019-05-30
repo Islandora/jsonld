@@ -3,7 +3,6 @@
 namespace Drupal\Tests\jsonld\Kernel;
 
 use Drupal\Core\Cache\MemoryBackend;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -76,10 +75,27 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
   protected $rdfMapping;
 
   /**
+   * The Language manager for our tests.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * A route provider for our tests.
+   *
+   * @var \Drupal\Core\Routing\RouteProviderInterface
+   */
+  protected $routeProvider;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
+
+    $this->languageManager = \Drupal::service('language_manager');
+    $this->routeProvider = \Drupal::service('router.route_provider');
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
@@ -170,7 +186,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
 
     // Set up the mock serializer.
     $normalizers = [
-      new ContentEntityNormalizer($link_manager, $entity_manager, \Drupal::moduleHandler(), \Drupal::service('config.factory')),
+      new ContentEntityNormalizer($link_manager, $entity_manager, \Drupal::moduleHandler(), \Drupal::service('config.factory'), $this->languageManager, $this->routeProvider),
       new EntityReferenceItemNormalizer($link_manager, $chain_resolver, $jsonld_context_generator),
       new FieldItemNormalizer($jsonld_context_generator),
       new FieldNormalizer(),
@@ -180,29 +196,6 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
       new JsonldEncoder(),
     ];
     $this->serializer = new Serializer($normalizers, $encoders);
-  }
-
-  /**
-   * Constructs the entity URI.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity.
-   *
-   * @return string
-   *   The entity URI.
-   *
-   * @throws \Drupal\Core\Entity\EntityMalformedException
-   *   The toUrl() call fails.
-   */
-  protected function getEntityUri(EntityInterface $entity) {
-
-    // Some entity types don't provide a canonical link template, at least call
-    // out to ->url().
-    if ($entity->isNew() || !$entity->hasLinkTemplate('canonical')) {
-      return $entity->toUrl('canonical', []);
-    }
-    $url = $entity->toUrl('canonical', ['absolute' => TRUE]);
-    return $url->setRouteParameter('_format', 'jsonld')->toString();
   }
 
   /**
@@ -272,16 +265,20 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
     $entity = EntityTest::create($values);
     $entity->save();
 
+    $id = "http://localhost/entity_test/" . $entity->id() . "?_format=jsonld";
+    $target_id = "http://localhost/entity_test/" . $target_entity->id() . "?_format=jsonld";
+    $user_id = "http://localhost/user/" . $target_user->id() . "?_format=jsonld";
+
     $expected = [
       "@graph" => [
         [
-          "@id" => $this->getEntityUri($entity),
+          "@id" => $id,
           "@type" => [
             'http://schema.org/ImageObject',
           ],
           "http://purl.org/dc/terms/references" => [
             [
-              "@id" => $this->getEntityUri($target_entity),
+              "@id" => $target_id,
             ],
           ],
           "http://purl.org/dc/terms/description" => [
@@ -298,7 +295,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
           ],
           "http://schema.org/author" => [
             [
-              "@id" => $this->getEntityUri($target_user),
+              "@id" => $user_id,
             ],
           ],
           "http://schema.org/dateCreated" => [
@@ -309,11 +306,11 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
           ],
         ],
         [
-          "@id" => $this->getEntityUri($target_user),
+          "@id" => $user_id,
           "@type" => "http://localhost/rest/type/user/user",
         ],
         [
-          "@id" => $this->getEntityUri($target_entity),
+          "@id" => $target_id,
           "@type" => [
             "http://schema.org/ImageObject",
           ],

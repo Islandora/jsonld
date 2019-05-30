@@ -3,8 +3,6 @@
 namespace Drupal\Tests\jsonld\Kernel;
 
 use Drupal\Core\Cache\MemoryBackend;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -21,7 +19,6 @@ use Drupal\serialization\EntityResolver\ChainEntityResolver;
 use Drupal\serialization\EntityResolver\TargetIdResolver;
 use Drupal\serialization\EntityResolver\UuidResolver;
 use Drupal\user\Entity\User;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Serializer\Serializer;
 use Drupal\language\Entity\ConfigurableLanguage;
 
@@ -202,50 +199,6 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
   }
 
   /**
-   * Constructs the entity URI.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity.
-   *
-   * @return string
-   *   The entity URI.
-   *
-   * @throws \Drupal\Core\Entity\EntityMalformedException
-   *   The toUrl() call fails.
-   */
-  protected function getEntityUri(EntityInterface $entity) {
-
-    // Some entity types don't provide a canonical link template, at least call
-    // out to ->url().
-    if ($entity->isNew() || !$entity->hasLinkTemplate('canonical')) {
-      if ($entity->getEntityTypeId() == 'file') {
-        return $entity->url();
-      }
-      return "";
-    }
-
-    try {
-      $undefined = $this->languageManager->getLanguage('und');
-      $entity_type = $entity->getEntityTypeId();
-
-      // This throws the RouteNotFoundException if the route doesn't exist.
-      $this->routeProvider->getRouteByName("rest.entity.$entity_type.GET");
-
-      $url = Url::fromRoute(
-        "rest.entity.$entity_type.GET",
-        [$entity_type => $entity->id()],
-        ['absolute' => TRUE, 'language' => $undefined]
-      );
-    }
-    catch (RouteNotFoundException $e) {
-      $url = $entity->toUrl('canonical', ['absolute' => TRUE]);
-    }
-    // We don't currently test disabling the _format=jsonld ending.
-    $url->setRouteParameter('_format', 'jsonld');
-    return $url->toString();
-  }
-
-  /**
    * Generate a test entity and the expected normalized array.
    *
    * @return array
@@ -312,16 +265,20 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
     $entity = EntityTest::create($values);
     $entity->save();
 
+    $id = "http://localhost/entity_test/" . $entity->id() . "?_format=jsonld";
+    $target_id = "http://localhost/entity_test/" . $target_entity->id() . "?_format=jsonld";
+    $user_id = "http://localhost/user/" . $target_user->id() . "?_format=jsonld";
+
     $expected = [
       "@graph" => [
         [
-          "@id" => $this->getEntityUri($entity),
+          "@id" => $id,
           "@type" => [
             'http://schema.org/ImageObject',
           ],
           "http://purl.org/dc/terms/references" => [
             [
-              "@id" => $this->getEntityUri($target_entity),
+              "@id" => $target_id,
             ],
           ],
           "http://purl.org/dc/terms/description" => [
@@ -338,7 +295,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
           ],
           "http://schema.org/author" => [
             [
-              "@id" => $this->getEntityUri($target_user),
+              "@id" => $user_id,
             ],
           ],
           "http://schema.org/dateCreated" => [
@@ -349,11 +306,11 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
           ],
         ],
         [
-          "@id" => $this->getEntityUri($target_user),
+          "@id" => $user_id,
           "@type" => "http://localhost/rest/type/user/user",
         ],
         [
-          "@id" => $this->getEntityUri($target_entity),
+          "@id" => $target_id,
           "@type" => [
             "http://schema.org/ImageObject",
           ],

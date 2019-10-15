@@ -9,7 +9,7 @@ JSON-LD Serializer for Drupal 8 and Islandora.
 
 This module adds a simple Drupal entity to JSON-LD 
 `normalizer/serializer/unserializer` service provider and a few supporting 
-classes. It depends on RDF module and existing fields to rdf properties 
+classes. It depends on RDF module and existing fields to RDF properties 
 mappings to do it's job.
 
 ## Configuration
@@ -31,7 +31,7 @@ If you would like to contribute, please get involved by attending our weekly
 
 If you would like to contribute code to the project, you need to be covered by 
 an Islandora Foundation [Contributor License Agreement][6] or 
-[Corporate Contributor Licencse Agreement][7]. Please see the [Contributors][8]
+[Corporate Contributor License Agreement][7]. Please see the [Contributors][8]
  pages on Islandora.ca for more information.
 
 ## License

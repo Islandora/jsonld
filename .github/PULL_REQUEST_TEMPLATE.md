@@ -18,7 +18,7 @@ possible side effects.
 * Does this change require documentation to be updated? 
 * Does this change add any new dependencies? 
 * Does this change require any other modifications to be made to the repository
-(ie. Regeneration activity, etc.)? 
+(i.e. Regeneration activity, etc.)? 
 * Could this change impact execution of existing code?
 
 # How should this be tested?

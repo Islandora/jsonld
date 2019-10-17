@@ -2,15 +2,18 @@
 sudo: true
 language: php
 php:
-  - 7.1
   - 7.2
+  - 7.3
 
 matrix:
     fast_finish: true
+    allowed_failures:
+      - php: 7.3
 
 branches:
   only:
     - /^8.x-1.x/
+    - /master/
 
 before_install:
   - export SCRIPT_DIR=$HOME/CLAW/.scripts

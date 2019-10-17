@@ -3,10 +3,9 @@
     "description": "JSON-LD serializer for Drupal 8",
     "type": "drupal-module",
     "license": "GPL-2.0+",
-    "homepage": "https://github.com/islandora-claw/jsonld",
+    "homepage": "https://github.com/Islandora/jsonld",
     "support": {
-        "issues": "https://github.com/islandora-claw/CLAW/issues",
-        "irc": "irc://irc.freenode.net/islandora"
+        "issues": "https://github.com/Islandora/documentation/issues"
     },
     "authors": [
         {

@@ -10,6 +10,9 @@ matrix:
     allowed_failures:
       - php: 7.3
 
+services:
+  - mysql
+
 branches:
   only:
     - /^8.x-1.x/

@@ -10,6 +10,9 @@ namespace Drupal\Tests\jsonld\Kernel;
  */
 class JsonldHookTest extends JsonldKernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = [
     'entity_test',
     'hal',

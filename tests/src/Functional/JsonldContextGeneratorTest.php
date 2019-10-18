@@ -19,6 +19,9 @@ class JsonldContextGeneratorTest extends BrowserTestBase {
    */
   private $user;
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
     'node',
     'jsonld',

@@ -1,6 +1,6 @@
 name: 'JSON-LD'
 type: module
-description: 'Serializes entities to JSON-LD / LDP for the islandora CLAW Project'
+description: 'Serializes entities to JSON-LD / LDP for the Islandora Project'
 package: Web services
 core: 8.x
 dependencies:

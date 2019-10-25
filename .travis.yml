@@ -40,10 +40,11 @@ script:
   - phpcpd --names *.module,*.inc,*.test,*.php $TRAVIS_BUILD_DIR
   - php core/scripts/run-tests.sh --url http://127.0.0.1:8282 --verbose --php `which php` jsonld
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 notifications:
-  irc:
-    channels:
-      - "irc.freenode.org#islandora"
+  slack:
     on_success: change
     on_failure: always
-    skip_join: true
+    secure: $SLACK_NOTIFICATION_KEY

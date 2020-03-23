@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\jsonld\Kernel;
 
-use Drupal\Core\Cache\MemoryBackend;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -12,12 +11,8 @@ use Drupal\jsonld\Normalizer\EntityReferenceItemNormalizer;
 use Drupal\jsonld\Normalizer\FieldItemNormalizer;
 use Drupal\jsonld\Normalizer\FieldNormalizer;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\hal\LinkManager\LinkManager;
-use Drupal\hal\LinkManager\RelationLinkManager;
-use Drupal\hal\LinkManager\TypeLinkManager;
 use Drupal\serialization\EntityResolver\ChainEntityResolver;
 use Drupal\serialization\EntityResolver\TargetIdResolver;
-use Drupal\serialization\EntityResolver\UuidResolver;
 use Drupal\user\Entity\User;
 use Symfony\Component\Serializer\Serializer;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -44,6 +39,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
     'jsonld',
     'language',
     'content_translation',
+    'rest',
   ];
 
   /**
@@ -177,10 +173,10 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
       'translatable' => FALSE,
     ])->save();
 
-    $entity_manager = \Drupal::entityManager();
-    $link_manager = new LinkManager(new TypeLinkManager(new MemoryBackend('default'), \Drupal::moduleHandler(), \Drupal::service('config.factory'), \Drupal::service('request_stack'), \Drupal::service('entity_type.bundle.info')), new RelationLinkManager(new MemoryBackend('default'), $entity_manager, \Drupal::moduleHandler(), \Drupal::service('config.factory'), \Drupal::service('request_stack')));
-
-    $chain_resolver = new ChainEntityResolver([new UuidResolver($entity_manager), new TargetIdResolver()]);
+    $entity_manager = \Drupal::service('entity_type.manager');
+    $link_manager = \Drupal::service('rest.link_manager');
+    $uuid_resolver = \Drupal::service('serializer.entity_resolver.uuid');
+    $chain_resolver = new ChainEntityResolver([$uuid_resolver, new TargetIdResolver()]);
 
     $jsonld_context_generator = $this->container->get('jsonld.contextgenerator');
 

@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\jsonld\Kernel;
 
-use Drupal\Core\Cache\MemoryBackend;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -12,12 +11,8 @@ use Drupal\jsonld\Normalizer\EntityReferenceItemNormalizer;
 use Drupal\jsonld\Normalizer\FieldItemNormalizer;
 use Drupal\jsonld\Normalizer\FieldNormalizer;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\hal\LinkManager\LinkManager;
-use Drupal\hal\LinkManager\RelationLinkManager;
-use Drupal\hal\LinkManager\TypeLinkManager;
 use Drupal\serialization\EntityResolver\ChainEntityResolver;
 use Drupal\serialization\EntityResolver\TargetIdResolver;
-use Drupal\serialization\EntityResolver\UuidResolver;
 use Drupal\user\Entity\User;
 use Symfony\Component\Serializer\Serializer;
 use Drupal\language\Entity\ConfigurableLanguage;

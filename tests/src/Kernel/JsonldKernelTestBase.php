@@ -174,7 +174,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
     ])->save();
 
     $entity_manager = \Drupal::service('entity_type.manager');
-    $link_manager = \Drupal::service('rest.link_manager');
+    $link_manager = \Drupal::service('hal.link_manager');
     $uuid_resolver = \Drupal::service('serializer.entity_resolver.uuid');
     $chain_resolver = new ChainEntityResolver([$uuid_resolver, new TargetIdResolver()]);
 

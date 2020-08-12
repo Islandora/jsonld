@@ -28,6 +28,11 @@ class JsonldContextGeneratorTest extends BrowserTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
    * Initial setup tasks that for every method method.
    */
   public function setUp() {

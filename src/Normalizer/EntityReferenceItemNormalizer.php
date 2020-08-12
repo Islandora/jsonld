@@ -76,9 +76,9 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
     $context['included_fields'] = ['uuid'];
     $context['needs_jsonldcontext'] = FALSE;
     $context['embedded'] = TRUE;
-    // Normalize the target entity.
-    // This will call \Drupal\jsonld\Normalizer\ContentEntityNormalizer.
-    $embedded = $this->serializer->normalize($target_entity, $format, $context);
+
+    // The normalized object we will collect entries into.
+    $normalized_in_context = [];
 
     if (isset($context['current_entity_rdf_mapping'])) {
       $values_clean = [];
@@ -93,25 +93,29 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
       $field_keys = isset($field_mappings['properties']) ?
             $field_mappings['properties'] :
             [$field_item->getParent()->getName()];
-      if (!empty($field_mappings['datatype'])) {
-        $values_clean['@type'] = $field_mappings['datatype'];
-      }
 
       // Value in this case is the target entity, so if a callback exists
       // it should work against that?
       if (!empty($field_mappings['datatype_callback'])) {
         $callback = $field_mappings['datatype_callback']['callable'];
         $arguments = isset($field_mappings['datatype_callback']['arguments']) ? $field_mappings['datatype_callback']['arguments'] : NULL;
-        $values_clean['@value'] = call_user_func($callback, $target_entity, $arguments);
+        $transformed_value = call_user_func($callback, $target_entity, $arguments);
+        if (!empty($field_mappings['datatype']) && $field_mappings['datatype'] == '@id') {
+          $values_clean['@id'] = $transformed_value;
+          $values_clean['@type'] = '@id';
+        }
+        else {
+          $values_clean['@value'] = $transformed_value;
+        }
       }
-      // Since getting the to embed entity URL here could be a little bit
-      // expensive and would require an helper method
-      // i could just borrow it from the $embed result.
-      $values_clean['@id'] = key($embedded['@graph']);
-      // Because having a @type for a reference causes problems, we strip that.
-      // This could be removed using headers in future.
-      if (isset($values_clean['@type'])) {
-        unset($values_clean['@type']);
+      else {
+        // Normalize the target entity.
+        // This will call \Drupal\jsonld\Normalizer\ContentEntityNormalizer.
+        $normalized_in_context = $this->serializer->normalize($target_entity, $format, $context);
+        // Since getting the to embed entity URL here could be a little bit
+        // expensive and would require an helper method
+        // i could just borrow it from above.
+        $values_clean['@id'] = key($normalized_in_context['@graph']);
       }
 
       // The returned structure will be recursively merged into the normalized
@@ -130,7 +134,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
 
     }
 
-    $normalized_in_context = array_merge_recursive($embedded, ['@graph' => [$context['current_entity_id'] => $normalized_prop]]);
+    $normalized_in_context = array_merge_recursive($normalized_in_context, ['@graph' => [$context['current_entity_id'] => $normalized_prop]]);
 
     return $normalized_in_context;
   }

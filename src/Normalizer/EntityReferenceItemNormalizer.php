@@ -95,20 +95,29 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
             [$field_item->getParent()->getName()];
 
       // Value in this case is the target entity, so if a callback exists
-      // it should work against that?
+      // it should work against that.
       if (!empty($field_mappings['datatype_callback'])) {
         $callback = $field_mappings['datatype_callback']['callable'];
         $arguments = isset($field_mappings['datatype_callback']['arguments']) ? $field_mappings['datatype_callback']['arguments'] : NULL;
         $transformed_value = call_user_func($callback, $target_entity, $arguments);
+        // If the config says it is an @id, we'll save it as an @id.
         if (!empty($field_mappings['datatype']) && $field_mappings['datatype'] == '@id') {
           $values_clean['@id'] = $transformed_value;
           $values_clean['@type'] = '@id';
         }
+        // Either we transformed it into another fieldable entity, or got the
+        // same one back. We will process the fieldable entity later on.
+        elseif ($transformed_value instanceof FieldableEntityInterface) {
+          $target_entity = $transformed_value;
+        }
+        // Save anything else as a value.
         else {
           $values_clean['@value'] = $transformed_value;
         }
       }
-      else {
+      // Time to process the fieldable entity if we don't have
+      // an '@id' or '@value'.
+      if (empty($values_clean['@id']) && empty($values_clean['@value'])) {
         // Normalize the target entity.
         // This will call \Drupal\jsonld\Normalizer\ContentEntityNormalizer.
         $normalized_in_context = $this->serializer->normalize($target_entity, $format, $context);

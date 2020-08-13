@@ -11,8 +11,9 @@ class EntityReferenceConverter {
    * Swaps out an Entity's URI with the value in a field.
    *
    * @param array|\Drupal\Core\Entity\EntityInterface $target
-   *   Either the target of the entity reference field being converted (JSON-LD module)
-   *   or an array with 'target_id' (RDF module).
+   *   Either the target of the entity reference field being converted
+   *   (as the JSON-LD module does) or an array with 'target_id'
+   *   (as the RDF module does).
    * @param array $arguments
    *   An array of arguments defined in the mapping.
    *   Expected keys are:

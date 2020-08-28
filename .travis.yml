@@ -16,7 +16,7 @@ services:
 branches:
   only:
     - /^8.x-1.x/
-    - /master/
+    - /main/
 
 before_install:
   - export SCRIPT_DIR=$HOME/islandora/.scripts

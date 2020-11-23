@@ -57,7 +57,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
    */
   public function normalize($field_item, $format = NULL, array $context = []) {
 
-    /* @var $field_item \Drupal\Core\Field\FieldItemInterface */
+    /** @var \Drupal\Core\Field\FieldItemInterface $field_item */
     $target_entity = $field_item->get('entity')->getValue();
     $normalized_prop = [];
     // If this is not a content entity, let the parent implementation handle it,

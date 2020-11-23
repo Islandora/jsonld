@@ -75,7 +75,10 @@ class JsonldContextGeneratorTest extends BrowserTestBase {
    * Tests that the Context Response Page can be reached.
    */
   public function testJsonldcontextPageExists() {
-    $url = Url::fromRoute('jsonld.context', ['entity_type' => 'node', 'bundle' => 'test_type']);
+    $url = Url::fromRoute(
+      'jsonld.context',
+      ['entity_type' => 'node', 'bundle' => 'test_type']
+    );
     $this->drupalGet($url);
     $this->assertSession()->statusCodeEquals(200);
   }
@@ -84,7 +87,10 @@ class JsonldContextGeneratorTest extends BrowserTestBase {
    * Tests that the response is in fact application/ld+json.
    */
   public function testJsonldcontextContentypeheaderResponseIsValid() {
-    $url = Url::fromRoute('jsonld.context', ['entity_type' => 'node', 'bundle' => 'test_type']);
+    $url = Url::fromRoute(
+      'jsonld.context',
+      ['entity_type' => 'node', 'bundle' => 'test_type']
+    );
     $this->drupalGet($url);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertEquals($this->drupalGetHeader('Content-Type'), 'application/ld+json', 'Correct JSON-LD mime type was returned');
@@ -107,7 +113,10 @@ class JsonldContextGeneratorTest extends BrowserTestBase {
       ],
     ];
 
-    $url = Url::fromRoute('jsonld.context', ['entity_type' => 'node', 'bundle' => 'test_type']);
+    $url = Url::fromRoute(
+      'jsonld.context',
+      ['entity_type' => 'node', 'bundle' => 'test_type']
+    );
     $this->drupalGet($url);
     $this->assertSession()->statusCodeEquals(200);
     $jsonldarray = json_decode($this->getSession()->getPage()->getContent(), TRUE);

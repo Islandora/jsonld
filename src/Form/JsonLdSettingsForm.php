@@ -6,7 +6,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class JsonLdSettingsForm.
+ * Config form for the module.
  *
  * @package Drupal\jsonld\Form
  */

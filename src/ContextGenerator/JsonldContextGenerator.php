@@ -134,7 +134,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
    * {@inheritdoc}
    */
   public function generateContext(RdfMappingInterface $rdfMapping) {
-    // TODO: we will need to use \Drupal\Core\Field\FieldDefinitionInterface
+    // @todo we will need to use \Drupal\Core\Field\FieldDefinitionInterface
     // a lot to be able to create/frame/discern drupal bundles based on JSON-LD
     // So keep an eye on that definition.
     $allRdfNameSpaces = rdf_get_namespaces();
@@ -308,7 +308,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
   /**
    * Naive approach on Drupal field to JSON-LD type mapping.
    *
-   * TODO: Would be fine to have this definitions in an
+   * @todo Would be fine to have this definitions in an
    * configEntity way in the future.
    *
    * @param string $field_type

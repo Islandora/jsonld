@@ -3,7 +3,7 @@
 namespace Drupal\Tests\jsonld\Kernel;
 
 /**
- * Class JsonldHookTest.
+ * Tests the module hooks.
  *
  * @package Drupal\Tests\jsonld\Kernel
  * @group jsonld

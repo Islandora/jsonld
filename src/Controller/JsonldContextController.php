@@ -13,7 +13,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 
 /**
- * Class JsonldContextController.
+ * Controller for retrieving jsonld contexts.
  *
  * @package Drupal\jsonld\Controller
  */
@@ -64,7 +64,7 @@ class JsonldContextController extends ControllerBase {
    */
   public function content($entity_type, $bundle, Request $request) {
 
-    // TODO: expose cached/not cached through
+    // @todo expose cached/not cached through
     // more varied HTTP response codes.
     try {
       $context = $this->jsonldContextGenerator->getContext("$entity_type.$bundle");

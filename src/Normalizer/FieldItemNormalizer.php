@@ -40,7 +40,7 @@ class FieldItemNormalizer extends NormalizerBase {
    */
   public function normalize($field_item, $format = NULL, array $context = []) {
 
-    // @TODO Understand Drupal complex fields to RDF mapping
+    // @todo Understand Drupal complex fields to RDF mapping
     // Fields can be complex, with multiple subfields
     // but i'm not sure if rdf module
     // is able to assign that, so investigate:

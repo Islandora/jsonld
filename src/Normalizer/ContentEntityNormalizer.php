@@ -107,7 +107,7 @@ class ContentEntityNormalizer extends NormalizerBase {
   public function normalize($entity, $format = NULL, array $context = []) {
 
     // We need to make sure that this only runs for JSON-LD.
-    // @TODO check $format before going RDF crazy
+    // @todo check $format before going RDF crazy
     $normalized = [];
 
     if (isset($context['depth'])) {
@@ -148,7 +148,7 @@ class ContentEntityNormalizer extends NormalizerBase {
     }
 
     // Create the array of normalized fields, starting with the URI.
-    /* @var $entity \Drupal\Core\Entity\ContentEntityInterface */
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $normalized = $normalized + [
       '@graph' => [
         $this->getEntityUri($entity) => [

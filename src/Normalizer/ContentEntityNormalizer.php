@@ -297,7 +297,7 @@ class ContentEntityNormalizer extends NormalizerBase {
     // out to ->url().
     if ($entity->isNew() || !$entity->hasLinkTemplate('canonical')) {
       if ($entity->getEntityTypeId() == 'file') {
-        return $entity->toUrl();
+        return $entity->createFileUrl(FALSE);
       }
       return "";
     }

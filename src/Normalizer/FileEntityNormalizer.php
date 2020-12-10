@@ -92,7 +92,7 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
     $file_data = (string) $this->httpClient->get($data['uri'][0]['value'])->getBody();
 
     $path = 'temporary://' . $this->fileSystem->basename($data['uri'][0]['value']);
-    $data['uri'] = FileSystemInterface::saveData($file_data, $path);
+    $data['uri'] = $this->fileSystem->saveData($file_data, $path);
 
     return $this->entityManager->getStorage('file')->create($data);
   }

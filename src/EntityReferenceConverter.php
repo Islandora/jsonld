@@ -29,10 +29,10 @@ class EntityReferenceConverter {
 
     if (is_array($target) && array_key_exists('target_id', $target)) {
       $ent = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->load($target['target_id']);
-      if (!empty($ent->get($arguments['link_field'])->uri)) {
+      if ($ent && !empty($ent->get($arguments['link_field'])->uri)) {
         return $ent->get($arguments['link_field'])->uri;
       }
-      else {
+      else if ($ent) {
         return $ent->get('name')->value;
       }
     }

@@ -32,7 +32,7 @@ class EntityReferenceConverter {
       if ($ent && !empty($ent->get($arguments['link_field'])->uri)) {
         return $ent->get($arguments['link_field'])->uri;
       }
-      else if ($ent) {
+      elseif ($ent) {
         return $ent->get('name')->value;
       }
     }

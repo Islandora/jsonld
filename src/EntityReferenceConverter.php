@@ -26,6 +26,16 @@ class EntityReferenceConverter {
     if (is_a($target, 'Drupal\Core\Entity\FieldableEntityInterface') && !empty($target->get($arguments['link_field'])->uri)) {
       return $target->get($arguments['link_field'])->uri;
     }
+
+    if (is_array($target) && array_key_exists('target_id', $target)) {
+      $ent = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->load($target['target_id']);
+      if ($ent && !empty($ent->get($arguments['link_field'])->uri)) {
+        return $ent->get($arguments['link_field'])->uri;
+      }
+      elseif ($ent) {
+        return $ent->get('name')->value;
+      }
+    }
     // We don't have a value to pass, so don't bother converting.
     return $target;
   }

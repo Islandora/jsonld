@@ -5,3 +5,15 @@ jsonld.settings:
     remove_jsonld_format:
       type: boolean 
       label: 'If checked, ?_format=jsonld will be stripped from the end of urls in JSONLD'
+    rdf_namespaces:
+        type: sequence
+        label: 'RDF Namespaces'
+        sequence:
+            type: mapping
+            mapping:
+                prefix: 
+                    type: string
+                    label: 'RDF Prefix'
+                namespace:
+                    type: string
+                    label: 'Fully Qualified RDF Namespace'

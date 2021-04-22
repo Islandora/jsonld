@@ -103,5 +103,7 @@ jobs:
         run: $SCRIPT_DIR/travis_scripts.sh
 
       - name: PHPUNIT tests
-        run: $SCRIPT_DIR/run-tests.sh "jsonld"
+        run: |
+          cd $DRUPAL_DIR/web
+          php core/scripts/run-tests.sh --suppress-deprecations --url http://127.0.0.1:8282 --verbose --php `which php` --module jsonld
 

@@ -26,6 +26,7 @@ class JsonldContextGeneratorTest extends KernelTestBase {
     'rdf_test_namespaces',
     'serialization',
     'system',
+    'user',
   ];
 
   /**

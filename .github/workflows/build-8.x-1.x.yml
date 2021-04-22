@@ -1,0 +1,107 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the 8.x branch
+  push:
+    branches: [ 8.x-1.x, main, github_actions ]
+  pull_request:
+    branches: [ 8.x-1.x, main, github_actions ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions: ["7.3", "7.4"]
+        drupal-version: ["8.9.11", "9.1.5"]
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: drupal
+        ports:
+          - 3306:3306
+      activemq:
+        image: webcenter/activemq:5.14.3
+        ports:
+          - 8161:8161
+          - 61616:61616
+          - 61613:61613
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: build_dir
+
+      - name: Checkout islandora_ci
+        uses: actions/checkout@v2
+        with:
+          repository: islandora/islandora_ci
+          ref: github-actions
+          path: islandora_ci
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          tools: composer:v2
+
+      - name: Setup Mysql client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
+
+      - name: Set environment variables
+        run: |
+          echo "DRUPAL_VERSION=${{ matrix.drupal-version }}" >> $GITHUB_ENV
+          echo "SCRIPT_DIR=$GITHUB_WORKSPACE/islandora_ci" >> $GITHUB_ENV
+          echo "DRUPAL_DIR=/opt/drupal" >> $GITHUB_ENV
+          echo "PHPUNIT_FILE=$GITHUB_WORKSPACE/build_dir/phpunit.xml" >> $GITHUB_ENV
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      - name: Setup Drupal
+        run: |
+          mkdir $DRUPAL_DIR
+          $SCRIPT_DIR/travis_setup_drupal.sh
+          cd $DRUPAL_DIR
+          chmod -R u+w web/sites/default
+          mkdir -p web/sites/simpletest/browser_output
+
+      - name: Setup composer paths
+        run: |
+          git -C "$GITHUB_WORKSPACE/build_dir" checkout -b travis-testing
+          cd $DRUPAL_DIR
+          composer config repositories.local path "$GITHUB_WORKSPACE/build_dir"
+          composer config minimum-stability dev
+          composer require "islandora/jsonld:dev-travis-testing as dev-8.x-1.x" --prefer-source -W
+
+      - name: Install modules
+        run: |
+          cd $DRUPAL_DIR/web
+          drush --uri=127.0.0.1:8282 en -y jsonld
+
+      - name: Test scripts
+        run: $SCRIPT_DIR/travis_scripts.sh
+
+      - name: PHPUNIT tests
+        run: $SCRIPT_DIR/run-tests.sh "jsonld"
+

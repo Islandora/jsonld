@@ -13,7 +13,7 @@ use Drupal\KernelTests\KernelTestBase;
  * @group jsonld
  * @coversDefaultClass \Drupal\jsonld\ContextGenerator\JsonldContextGenerator
  */
-class JsonldContextGeneratorTest extends KernelTestBase {
+class JsonldContextGeneratorTest extends JsonldKernelTestBase {
 
   /**
    * {@inheritdoc}

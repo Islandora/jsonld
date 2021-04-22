@@ -97,7 +97,7 @@ jobs:
       - name: Install modules
         run: |
           cd $DRUPAL_DIR/web
-          drush --uri=127.0.0.1:8282 en -y jsonld
+          drush --uri=127.0.0.1:8282 en -y user jsonld
 
       - name: Test scripts
         run: $SCRIPT_DIR/travis_scripts.sh

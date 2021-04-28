@@ -1,6 +1,5 @@
 # ![Islandora-JSON-LD](https://cloud.githubusercontent.com/assets/2371345/24964530/f054bddc-1f77-11e7-8b54-d04bb7b2281c.png) JSONLD
-[![Build Status][1]](https://travis-ci.com/Islandora/jsonld)
-[![Build Status](https://github.com/islandora/controlled_access_terms/actions/workflows/build-8.x-1.x.yml/badge.svg)](https://github.com/Islandora/controlled_access_terms/actions)
+[![Build Status][1]](https://github.com/Islandora/jsonld/actions)
 [![Contribution Guidelines][2]](./CONTRIBUTING.md)
 [![LICENSE][3]](./LICENSE)
 
@@ -41,7 +40,7 @@ an Islandora Foundation [Contributor License Agreement][6] or
 
 [GPLv2](http://www.gnu.org/licenses/gpl-2.0.txt)
 
-[1]: https://travis-ci.org/Islandora/jsonld.png?branch=8.x-1.x
+[1]: https://github.com/jsonld/actions/workflows/build-8.x-1.x.yml/badge.svg
 [2]: http://img.shields.io/badge/CONTRIBUTING-Guidelines-blue.svg
 [3]: https://img.shields.io/badge/license-GPLv2-blue.svg?style=flat-square
 [4]: https://github.com/whikloj

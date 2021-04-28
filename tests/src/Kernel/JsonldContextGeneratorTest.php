@@ -93,14 +93,13 @@ class JsonldContextGeneratorTest extends JsonldKernelTestBase {
 
   /**
    * Tests Exception in case of no rdf type.
-   *
-   * @covers \Drupal\jsonld\ContextGenerator\JsonldContextGenerator::generateContext
+   * @expectedException \Exception
+   * @covers \Drupal\jsonld\ContextGenerator\JsonldContextGenerator::getContext
    */
-  public function testGenerateContextException() {
+  public function testGetContextException() {
     $this->expectException(\Exception);
     // This should throw the expected Exception.
     $newEntity = $this->createContentType();
-    $rdfMapping = rdf_get_mapping('entity_test', $newEntity->id());
     $this->theJsonldContextGenerator->getContext('entity_test.' . $newEntity->id());
   }
 
@@ -121,15 +120,14 @@ class JsonldContextGeneratorTest extends JsonldKernelTestBase {
   /**
    * Tests Exception in case of no rdf type.
    *
-   * @expectedException \Exception
    * @covers \Drupal\jsonld\ContextGenerator\JsonldContextGenerator::generateContext
    */
   public function testGenerateContextException() {
+    $this->expectException(\Exception);
     // This should throw the expected Exception.
     $newEntity = $this->createContentType();
     $rdfMapping = rdf_get_mapping('entity_test', $newEntity->id());
     $this->theJsonldContextGenerator->getContext('entity_test.' . $newEntity->id());
-
   }
 
   /**

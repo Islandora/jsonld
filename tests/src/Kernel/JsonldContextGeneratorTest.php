@@ -5,7 +5,6 @@ namespace Drupal\Tests\jsonld\Kernel;
 use Drupal\Component\Utility\Random;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\jsonld\ContextGenerator\JsonldContextGenerator;
-use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Tests the Json-LD context Generator methods and simple integration.

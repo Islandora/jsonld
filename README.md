@@ -40,7 +40,7 @@ an Islandora Foundation [Contributor License Agreement][6] or
 
 [GPLv2](http://www.gnu.org/licenses/gpl-2.0.txt)
 
-[1]: https://github.com/jsonld/actions/workflows/build-8.x-1.x.yml/badge.svg
+[1]: https://github.com/islandora/jsonld/actions/workflows/build-8.x-1.x.yml/badge.svg
 [2]: http://img.shields.io/badge/CONTRIBUTING-Guidelines-blue.svg
 [3]: https://img.shields.io/badge/license-GPLv2-blue.svg?style=flat-square
 [4]: https://github.com/whikloj

@@ -5,7 +5,6 @@ namespace Drupal\Tests\jsonld\Kernel;
 use Drupal\Component\Utility\Random;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\jsonld\ContextGenerator\JsonldContextGenerator;
-use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Tests the Json-LD context Generator methods and simple integration.
@@ -13,7 +12,7 @@ use Drupal\KernelTests\KernelTestBase;
  * @group jsonld
  * @coversDefaultClass \Drupal\jsonld\ContextGenerator\JsonldContextGenerator
  */
-class JsonldContextGeneratorTest extends KernelTestBase {
+class JsonldContextGeneratorTest extends JsonldKernelTestBase {
 
   /**
    * {@inheritdoc}
@@ -26,6 +25,7 @@ class JsonldContextGeneratorTest extends KernelTestBase {
     'rdf_test_namespaces',
     'serialization',
     'system',
+    'user',
   ];
 
   /**
@@ -94,14 +94,13 @@ class JsonldContextGeneratorTest extends KernelTestBase {
   /**
    * Tests Exception in case of no rdf type.
    *
-   * @expectedException \Exception
    * @covers \Drupal\jsonld\ContextGenerator\JsonldContextGenerator::getContext
    */
   public function testGetContextException() {
+    $this->expectException(\Exception::class);
     // This should throw the expected Exception.
     $newEntity = $this->createContentType();
     $this->theJsonldContextGenerator->getContext('entity_test.' . $newEntity->id());
-
   }
 
   /**
@@ -121,15 +120,14 @@ class JsonldContextGeneratorTest extends KernelTestBase {
   /**
    * Tests Exception in case of no rdf type.
    *
-   * @expectedException \Exception
    * @covers \Drupal\jsonld\ContextGenerator\JsonldContextGenerator::generateContext
    */
   public function testGenerateContextException() {
+    $this->expectException(\Exception::class);
     // This should throw the expected Exception.
     $newEntity = $this->createContentType();
     $rdfMapping = rdf_get_mapping('entity_test', $newEntity->id());
     $this->theJsonldContextGenerator->getContext('entity_test.' . $newEntity->id());
-
   }
 
   /**

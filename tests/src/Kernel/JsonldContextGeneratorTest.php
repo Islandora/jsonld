@@ -94,7 +94,6 @@ class JsonldContextGeneratorTest extends JsonldKernelTestBase {
   /**
    * Tests Exception in case of no rdf type.
    *
-   * @expectedException \Exception
    * @covers \Drupal\jsonld\ContextGenerator\JsonldContextGenerator::getContext
    */
   public function testGetContextException() {

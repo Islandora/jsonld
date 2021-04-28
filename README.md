@@ -1,5 +1,6 @@
 # ![Islandora-JSON-LD](https://cloud.githubusercontent.com/assets/2371345/24964530/f054bddc-1f77-11e7-8b54-d04bb7b2281c.png) JSONLD
 [![Build Status][1]](https://travis-ci.com/Islandora/jsonld)
+[![Build Status](https://github.com/islandora/controlled_access_terms/actions/workflows/build-8.x-1.x.yml/badge.svg)](https://github.com/Islandora/controlled_access_terms/actions)
 [![Contribution Guidelines][2]](./CONTRIBUTING.md)
 [![LICENSE][3]](./LICENSE)
 

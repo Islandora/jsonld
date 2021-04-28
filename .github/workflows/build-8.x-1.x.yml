@@ -6,9 +6,9 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the 8.x branch
   push:
-    branches: [ 8.x-1.x, main, github_actions ]
+    branches: [ 8.x-1.x, main]
   pull_request:
-    branches: [ 8.x-1.x, main, github_actions ]
+    branches: [ 8.x-1.x, main]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

@@ -40,10 +40,6 @@ class JsonLdSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config(self::CONFIG_NAME);
     $mappings_from_hook = rdf_get_namespaces();
-    $mapping_string = '';
-    foreach ($mappings_from_hook as $pref => $nspace) {
-      $mapping_string .= "$pref|$nspace \n";
-    }
     $form = [
       self::REMOVE_JSONLD_FORMAT => [
         '#type' => 'checkbox',
@@ -55,7 +51,14 @@ class JsonLdSettingsForm extends ConfigFormBase {
 
     $rdf_namespaces = '';
     foreach ($config->get('rdf_namespaces') as $namespace) {
+      if (isset($mappings_from_hook[$namespace['prefix']])) {
+        unset($mappings_from_hook[$namespace['prefix']]);
+      }
       $rdf_namespaces .= $namespace['prefix'] . '|' . $namespace['namespace'] . "\n";
+    }
+    $mapping_string = '';
+    foreach ($mappings_from_hook as $pref => $nspace) {
+      $mapping_string .= "$pref|$nspace \n";
     }
     $form[self::RDF_NAMESPACES] = [
       '#type' => 'textarea',

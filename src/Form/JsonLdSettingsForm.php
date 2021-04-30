@@ -15,6 +15,7 @@ class JsonLdSettingsForm extends ConfigFormBase {
   const CONFIG_NAME = 'jsonld.settings';
 
   const REMOVE_JSONLD_FORMAT = 'remove_jsonld_format';
+
   const RDF_NAMESPACES = 'rdf_namespaces';
 
   /**
@@ -38,6 +39,11 @@ class JsonLdSettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config(self::CONFIG_NAME);
+    $mappings_from_hook = rdf_get_namespaces();
+    $mapping_string = '';
+    foreach ($mappings_from_hook as $pref => $nspace) {
+      $mapping_string .= "$pref|$nspace \n";
+    }
     $form = [
       self::REMOVE_JSONLD_FORMAT => [
         '#type' => 'checkbox',
@@ -53,9 +59,17 @@ class JsonLdSettingsForm extends ConfigFormBase {
     }
     $form[self::RDF_NAMESPACES] = [
       '#type' => 'textarea',
-      '#title' => $this->t('RDF Namespaces'),
+      '#title' => $this->t('Additional RDF Namespaces'),
       '#rows' => 10,
       '#default_value' => $rdf_namespaces,
+      '#description' => $this->t("Enter pipe-separated prefixes and namespaces e.g.<br /><strong>dcterms|http://purl.org/dc/terms/</strong>"),
+    ];
+    $form['existing'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Existing RDF Namespaces from modules'),
+      '#rows' => count($mappings_from_hook),
+      '#value' => $mapping_string,
+      '#attributes' => ['readonly' => 'readonly'],
     ];
 
     return parent::buildForm($form, $form_state);

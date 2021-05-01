@@ -57,7 +57,7 @@ abstract class NormalizerBase extends SerializationNormalizerBase implements Den
    */
   public static function escapePrefix($predicate, array $namespaces) {
 
-    $exploded = explode(":", $predicate);
+    $exploded = explode(":", $predicate, 2);
     if (!isset($namespaces[$exploded[0]])) {
       return $predicate;
     }

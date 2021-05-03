@@ -57,6 +57,7 @@ class JsonLdSettingsForm extends ConfigFormBase {
       $rdf_namespaces .= $namespace['prefix'] . '|' . $namespace['namespace'] . "\n";
     }
     $mapping_string = '';
+    ksort($mappings_from_hook);
     foreach ($mappings_from_hook as $pref => $nspace) {
       $mapping_string .= "$pref|$nspace \n";
     }

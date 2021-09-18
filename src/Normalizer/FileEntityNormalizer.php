@@ -2,13 +2,11 @@
 
 namespace Drupal\jsonld\Normalizer;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\FileSystemInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
+use Drupal\jsonld\Utils\JsonldNormalizerUtilsInterface;
 use GuzzleHttp\ClientInterface;
 
 /**
@@ -50,23 +48,17 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
    *   The module handler.
    * @param \Drupal\Core\File\FileSystemInterface $file_system
    *   The file system handler.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
+   * @param \Drupal\jsonld\Utils\JsonldNormalizerUtilsInterface $normalizer_utils
+   *   The json-ld normalizer utils.
    */
   public function __construct(EntityTypeManagerInterface $entity_manager,
                               ClientInterface $http_client,
                               LinkManagerInterface $link_manager,
                               ModuleHandlerInterface $module_handler,
                               FileSystemInterface $file_system,
-                              ConfigFactoryInterface $config_factory,
-                              LanguageManagerInterface $language_manager,
-                              RouteProviderInterface $route_provider) {
+                              JsonldNormalizerUtilsInterface $normalizer_utils) {
 
-    parent::__construct($link_manager, $entity_manager, $module_handler, $config_factory, $language_manager, $route_provider);
+    parent::__construct($link_manager, $entity_manager, $module_handler, $normalizer_utils);
 
     $this->httpClient = $http_client;
     $this->fileSystem = $file_system;
@@ -79,7 +71,7 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
 
     $data = parent::normalize($entity, $format, $context);
     // Replace the file url with a full url for the file.
-    $data['uri'][0]['value'] = $this->getEntityUri($entity);
+    $data['uri'][0]['value'] = $this->utils->getEntityUri($entity);
 
     return $data;
   }

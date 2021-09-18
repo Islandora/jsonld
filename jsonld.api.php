@@ -15,7 +15,10 @@ use Drupal\Core\Entity\EntityInterface;
  * @param array $normalized
  *   The current normalized array.
  * @param array $context
- *   The context for the normalization.
+ *   The context for the normalization
+ *
+ * $context['utils'] contains an instance of \Drupal\jsonld\Utils\JsonldNormalizerUtils, this provides
+ * the getEntityUri() method to correctly generate a URI with/without the ?format=jsonld suffix.
  */
 function hook_jsonld_alter_normalized_array(EntityInterface $entity, array &$normalized, array $context) {
   if ($entity->getEntityTypeId() == 'node') {

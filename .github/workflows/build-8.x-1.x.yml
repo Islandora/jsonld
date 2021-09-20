@@ -6,7 +6,7 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the 8.x branch
   push:
-    branches: [ 8.x-1.x, main]
+    branches: [ 8.x-1.x, main, issue-1766-test]
   pull_request:
     branches: [ 8.x-1.x, main]
 
@@ -70,6 +70,7 @@ jobs:
           echo "DRUPAL_VERSION=${{ matrix.drupal-version }}" >> $GITHUB_ENV
           echo "SCRIPT_DIR=$GITHUB_WORKSPACE/islandora_ci" >> $GITHUB_ENV
           echo "DRUPAL_DIR=/opt/drupal" >> $GITHUB_ENV
+          echo "PHPUNIT_FILE=$GITHUB_WORKSPACE/build_dir/phpunit.xml" >> $GITHUB_ENV
 
       - name: Cache Composer dependencies
         uses: actions/cache@v2
@@ -98,11 +99,13 @@ jobs:
           cd $DRUPAL_DIR/web
           drush --uri=127.0.0.1:8282 en -y user jsonld
 
+      - name: Copy PHPunit file
+        run: cp $PHPUNIT_FILE $DRUPAL_DIR/web/core/phpunit.xml
+
       - name: Test scripts
         run: $SCRIPT_DIR/travis_scripts.sh
 
       - name: PHPUNIT tests
         run: |
-          cd $DRUPAL_DIR/web
-          php core/scripts/run-tests.sh --suppress-deprecations --url http://127.0.0.1:8282 --verbose --php `which php` --module jsonld
-
+          cd $DRUPAL_DIR/web/core
+          $DRUPAL_DIR/vendor/bin/phpunit --verbose --debug

@@ -36,7 +36,7 @@ class JsonldContextGeneratorTest extends BrowserTestBase {
   /**
    * Initial setup tasks that for every method method.
    */
-  public function setUp() {
+  public function setUp() : void {
     parent::setUp();
 
     // Create a test content type.

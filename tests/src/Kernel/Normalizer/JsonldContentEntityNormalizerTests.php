@@ -5,16 +5,17 @@ namespace Drupal\Tests\jsonld\Kernel\Normalizer;
 use Drupal\Tests\jsonld\Kernel\JsonldKernelTestBase;
 
 /**
- * Class ContentEntityTests.
+ * Tests the JSON-LD Normalizer.
  *
  * @group jsonld
+ * @package \Drupal\Tests\jsonld\Kernel\Normalizer
  */
-class ContentEntityNormalizerTests extends JsonldKernelTestBase {
+class JsonldContentEntityNormalizerTests extends JsonldKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp() :void {
     parent::setUp();
 
     \Drupal::service('router.builder')->rebuild();

@@ -27,7 +27,7 @@ class JsonldHookTest extends JsonldKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp() : void {
     parent::setUp();
     \Drupal::service('router.builder')->rebuild();
   }

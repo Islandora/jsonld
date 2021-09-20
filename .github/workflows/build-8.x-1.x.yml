@@ -6,7 +6,7 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the 8.x branch
   push:
-    branches: [ 8.x-1.x, main, issue-1766-test]
+    branches: [ 8.x-1.x, main]
   pull_request:
     branches: [ 8.x-1.x, main]
 

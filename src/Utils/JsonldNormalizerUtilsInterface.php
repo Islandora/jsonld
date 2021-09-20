@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Interface for dependency injection of JSON-LD normalizer utilities.
+ *
  * @package Drupal\jsonld\Utils
  */
 interface JsonldNormalizerUtilsInterface {

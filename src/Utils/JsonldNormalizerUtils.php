@@ -2,7 +2,6 @@
 
 namespace Drupal\jsonld\Utils;
 
-
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -13,6 +12,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Utilities used both in JSON-LD and by modules utilizing the alter hook.
+ *
  * @package Drupal\jsonld\Utils
  */
 class JsonldNormalizerUtils implements JsonldNormalizerUtilsInterface {
@@ -42,11 +42,11 @@ class JsonldNormalizerUtils implements JsonldNormalizerUtilsInterface {
    * NormalizerUtils constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory
+   *   The configuration factory.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager
+   *   The language manager.
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider
+   *   The route provider.
    */
   public function __construct(
     ConfigFactoryInterface $config_factory,

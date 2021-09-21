@@ -10,6 +10,7 @@ use Drupal\jsonld\Normalizer\ContentEntityNormalizer;
 use Drupal\jsonld\Normalizer\EntityReferenceItemNormalizer;
 use Drupal\jsonld\Normalizer\FieldItemNormalizer;
 use Drupal\jsonld\Normalizer\FieldNormalizer;
+use Drupal\jsonld\Utils\JsonldNormalizerUtils;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\serialization\EntityResolver\ChainEntityResolver;
 use Drupal\serialization\EntityResolver\TargetIdResolver;
@@ -87,7 +88,7 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp() : void {
     parent::setUp();
 
     $this->languageManager = \Drupal::service('language_manager');
@@ -182,9 +183,11 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
 
     $jsonld_context_generator = $this->container->get('jsonld.contextgenerator');
 
+    $normalizer_utils = new JsonldNormalizerUtils(\Drupal::service('config.factory'), $this->languageManager, $this->routeProvider);
+
     // Set up the mock serializer.
     $normalizers = [
-      new ContentEntityNormalizer($link_manager, $entity_manager, \Drupal::moduleHandler(), \Drupal::service('config.factory'), $this->languageManager, $this->routeProvider),
+      new ContentEntityNormalizer($link_manager, $entity_manager, \Drupal::moduleHandler(), $normalizer_utils),
       new EntityReferenceItemNormalizer($link_manager, $chain_resolver, $jsonld_context_generator),
       new FieldItemNormalizer($jsonld_context_generator),
       new FieldNormalizer(),

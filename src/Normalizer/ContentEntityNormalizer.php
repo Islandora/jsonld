@@ -2,16 +2,10 @@
 
 namespace Drupal\jsonld\Normalizer;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Routing\RouteProviderInterface;
-use Drupal\Core\Url;
 use Drupal\hal\LinkManager\LinkManagerInterface;
-use Drupal\jsonld\Form\JsonLdSettingsForm;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Drupal\jsonld\Utils\JsonldNormalizerUtilsInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -50,25 +44,11 @@ class ContentEntityNormalizer extends NormalizerBase {
   protected $moduleHandler;
 
   /**
-   * The configuration.
+   * Json-ld normalizer utilities.
    *
-   * @var \Drupal\Core\Config\ImmutableConfig
+   * @var \Drupal\Jsonld\Utils\JsonldNormalizerUtilsInterface
    */
-  protected $config;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * The route provider.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
-   */
-  protected $routeProvider;
+  protected $utils;
 
   /**
    * Constructs an ContentEntityNormalizer object.
@@ -79,26 +59,18 @@ class ContentEntityNormalizer extends NormalizerBase {
    *   The entity manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
+   * @param \Drupal\Jsonld\Utils\JsonldNormalizerUtilsInterface $normalizer_utils
+   *   The json-ld normalizer utilities.
    */
   public function __construct(LinkManagerInterface $link_manager,
                               EntityTypeManagerInterface $entity_manager,
                               ModuleHandlerInterface $module_handler,
-                              ConfigFactoryInterface $config_factory,
-                              LanguageManagerInterface $language_manager,
-                              RouteProviderInterface $route_provider) {
+                              JsonldNormalizerUtilsInterface $normalizer_utils) {
 
     $this->linkManager = $link_manager;
     $this->entityManager = $entity_manager;
     $this->moduleHandler = $module_handler;
-    $this->config = $config_factory->get(JsonLdSettingsForm::CONFIG_NAME);
-    $this->languageManager = $language_manager;
-    $this->routeProvider = $route_provider;
+    $this->utils = $normalizer_utils;
   }
 
   /**
@@ -151,8 +123,8 @@ class ContentEntityNormalizer extends NormalizerBase {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $normalized = $normalized + [
       '@graph' => [
-        $this->getEntityUri($entity) => [
-          '@id' => $this->getEntityUri($entity),
+        $this->utils->getEntityUri($entity) => [
+          '@id' => $this->utils->getEntityUri($entity),
           '@type' => $types,
         ],
       ],
@@ -172,7 +144,7 @@ class ContentEntityNormalizer extends NormalizerBase {
       $fields = $entity->getFields();
     }
 
-    $context['current_entity_id'] = $this->getEntityUri($entity);
+    $context['current_entity_id'] = $this->utils->getEntityUri($entity);
     $context['current_entity_rdf_mapping'] = $rdf_mappings;
 
     foreach ($fields as $name => $field) {
@@ -201,6 +173,10 @@ class ContentEntityNormalizer extends NormalizerBase {
     }
 
     if (isset($context['depth']) && $context['depth'] == 0) {
+      if (!isset($context['utils'])) {
+        // Pass the normalizer utils to the invoking methods.
+        $context['utils'] = $this->utils;
+      }
       $this->moduleHandler->invokeAll(self::NORMALIZE_ALTER_HOOK,
         [$entity, &$normalized, $context]
       );
@@ -277,51 +253,6 @@ class ContentEntityNormalizer extends NormalizerBase {
     }
 
     return $entity;
-  }
-
-  /**
-   * Constructs the entity URI.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity.
-   *
-   * @return string
-   *   The entity URI.
-   *
-   * @throws \Drupal\Core\Entity\EntityMalformedException
-   *   When $entity->toUrl() fails.
-   */
-  protected function getEntityUri(EntityInterface $entity) {
-
-    // Some entity types don't provide a canonical link template, at least call
-    // out to ->url().
-    if ($entity->isNew() || !$entity->hasLinkTemplate('canonical')) {
-      if ($entity->getEntityTypeId() == 'file') {
-        return $entity->createFileUrl(FALSE);
-      }
-      return "";
-    }
-
-    try {
-      $undefined = $this->languageManager->getLanguage('und');
-      $entity_type = $entity->getEntityTypeId();
-
-      // This throws the RouteNotFoundException if the route doesn't exist.
-      $this->routeProvider->getRouteByName("rest.entity.$entity_type.GET");
-
-      $url = Url::fromRoute(
-        "rest.entity.$entity_type.GET",
-        [$entity_type => $entity->id()],
-        ['absolute' => TRUE, 'language' => $undefined]
-      );
-    }
-    catch (RouteNotFoundException $e) {
-      $url = $entity->toUrl('canonical', ['absolute' => TRUE]);
-    }
-    if (!$this->config->get(JsonLdSettingsForm::REMOVE_JSONLD_FORMAT)) {
-      $url->setRouteParameter('_format', 'jsonld');
-    }
-    return $url->toString();
   }
 
   /**

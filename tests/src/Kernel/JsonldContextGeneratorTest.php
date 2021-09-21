@@ -52,7 +52,7 @@ class JsonldContextGeneratorTest extends JsonldKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp() :void {
     parent::setUp();
 
     $types = ['schema:Thing'];

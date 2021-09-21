@@ -10,6 +10,10 @@ use Drupal\Core\Entity\EntityInterface;
 /**
  * Hook to alter the jsonld normalized array before it is encoded to json.
  *
+ * $context['utils'] contains an instance of
+ * \Drupal\jsonld\Utils\JsonldNormalizerUtils, this provides the getEntityUri()
+ * method to correctly generate a URI with/without the ?format=jsonld suffix.
+ *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity we are normalizing.
  * @param array $normalized

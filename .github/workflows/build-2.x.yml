@@ -6,9 +6,9 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the 8.x branch
   push:
-    branches: [ 8.x-1.x, main]
+    branches: [ 2.x, main]
   pull_request:
-    branches: [ 8.x-1.x, main]
+    branches: [ 2.x, main]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -92,7 +92,7 @@ jobs:
           cd $DRUPAL_DIR
           composer config repositories.local path "$GITHUB_WORKSPACE/build_dir"
           composer config minimum-stability dev
-          composer require "islandora/jsonld:dev-travis-testing as dev-8.x-1.x" --prefer-source -W
+          composer require "islandora/jsonld:dev-2.x" --prefer-source -W
 
       - name: Install modules
         run: |

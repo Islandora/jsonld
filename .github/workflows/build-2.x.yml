@@ -21,8 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ["7.3", "7.4"]
-        drupal-version: ["8.9.11", "9.1.5"]
+        php-versions: ["7.4", "8.0", "8.1"]
+        drupal-version: ["9.3.x", "9.4.x-dev"]
 
     services:
       mysql:

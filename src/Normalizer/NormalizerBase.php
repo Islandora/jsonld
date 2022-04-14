@@ -64,4 +64,26 @@ abstract class NormalizerBase extends SerializationNormalizerBase implements Den
     return $namespaces[$exploded[0]] . $exploded[1];
   }
 
+  /**
+   * Deduplicate lists of @types.
+   *
+   * @param array $array
+   *   The array to deduplicate.
+   *
+   * @return array
+   *   The deduplicated array.
+   */
+  protected static function deduplicateTypes(array $array): array {
+    if (isset($array['@graph'])) {
+      // Should only be run on a top level Jsonld array.
+      foreach ($array['@graph'] as $key => $value) {
+        if (isset($array['@graph'][$key]['@type']) && is_array($array['@graph'][$key]['@type'])) {
+          // Deduplicate @types
+          $array['@graph'][$key]['@type'] = array_unique($array['@graph'][$key]['@type']);
+        }
+      }
+    }
+    return $array;
+  }
+
 }

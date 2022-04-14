@@ -2,6 +2,7 @@
 
 namespace Drupal\jsonld\Normalizer;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
@@ -163,7 +164,14 @@ class ContentEntityNormalizer extends NormalizerBase {
         // but the interface (typehint) does not.
         // We could check if serializer implements normalizer interface
         // to avoid any possible errors in case someone swaps serializer.
-        $normalized = array_merge_recursive($normalized, $normalized_property);
+        $normalized = NestedArray::mergeDeepArray(
+          [
+            $normalized,
+            $normalized_property,
+          ]
+        );
+        // Deduplicate the @type elements.
+        $normalized = self::deduplicateTypes($normalized);
       }
     }
     // Clean up @graph if this is the top-level entity

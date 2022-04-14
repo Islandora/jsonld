@@ -63,7 +63,7 @@ class JsonldContextGeneratorTest extends JsonldKernelTestBase {
     ];
 
     // Save bundle mapping config.
-    $rdfMapping = rdf_get_mapping('entity_test', 'rdf_source')
+    rdf_get_mapping('entity_test', 'rdf_source')
       ->setBundleMapping(['types' => $types])
       ->setFieldMapping('created', $mapping)
       ->save();

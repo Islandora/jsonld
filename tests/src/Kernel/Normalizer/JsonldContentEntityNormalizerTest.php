@@ -3,6 +3,7 @@
 namespace Drupal\Tests\jsonld\Kernel\Normalizer;
 
 use Drupal\Tests\jsonld\Kernel\JsonldKernelTestBase;
+use Drupal\Tests\jsonld\Kernel\JsonldTestEntityGenerator;
 
 /**
  * Tests the JSON-LD Normalizer.
@@ -32,7 +33,7 @@ class JsonldContentEntityNormalizerTest extends JsonldKernelTestBase {
    */
   public function testSimpleNormalizeJsonld() {
 
-    list($entity, $expected) = $this->generateTestEntity();
+    list($entity, $expected) = JsonldTestEntityGenerator::create()->generateNewEntity();
 
     $normalized = $this->serializer->normalize($entity, $this->format);
     $this->assertEquals($expected, $normalized, "Did not normalize correctly.");
@@ -51,7 +52,7 @@ class JsonldContentEntityNormalizerTest extends JsonldKernelTestBase {
    */
   public function testLocalizedNormalizeJsonld() {
 
-    list($entity, $expected) = $this->generateTestEntity();
+    list($entity, $expected) = JsonldTestEntityGenerator::create()->generateNewEntity();
 
     $existing_entity_values = $entity->toArray();
     $target_entity_tl_id = $existing_entity_values['field_test_entity_reference'][0]['target_id'];
@@ -88,6 +89,47 @@ class JsonldContentEntityNormalizerTest extends JsonldKernelTestBase {
 
     $this->assertEquals($expected, $normalized, "Did not normalize correctly.");
 
+  }
+
+  /**
+   * Where multiple referenced entities are tied to the same rdf mapping.
+   */
+  public function testDeduplicateEntityReferenceMappings(): void {
+
+    list($entity, $expected) = JsonldTestEntityGenerator::create()->makeDuplicateReferenceMapping()->generateNewEntity();
+
+    $normalized = $this->serializer->normalize($entity, $this->format);
+
+    $this->assertEquals($expected, $normalized, "Did not normalize correctly.");
+  }
+
+  /**
+   * Test where multiple fields rdf mapping is referencing the same entity.
+   */
+  public function testDeduplicateEntityReferenceIds(): void {
+
+    list($entity, $expected) = JsonldTestEntityGenerator::create()->makeDuplicateReference()->generateNewEntity();
+
+    $normalized = $this->serializer->normalize($entity, $this->format);
+
+    $this->assertEquals($expected, $normalized, "Did not normalize correctly.");
+  }
+
+  /**
+   * Test where multiple fields are.
+   *
+   *  - are referencing the same entity.
+   *  - sharing the same RDF mapping.
+   */
+  public function testDuplicateEntityReferenceAndMappings(): void {
+    list($entity, $expected) = JsonldTestEntityGenerator::create()->makeDuplicateReference()->makeDuplicateReferenceMapping()
+      ->generateNewEntity();
+
+    $normalized = $this->serializer->normalize($entity, $this->format);
+
+    // var_dump($expected);
+    // var_dump($normalized);
+    $this->assertEquals($expected, $normalized, "Did not normalize correctly.");
   }
 
 }

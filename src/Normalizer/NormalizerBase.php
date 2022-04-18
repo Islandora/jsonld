@@ -65,7 +65,7 @@ abstract class NormalizerBase extends SerializationNormalizerBase implements Den
   }
 
   /**
-   * Deduplicate lists of @types.
+   * Deduplicate lists of @types and predicate to entity references.
    *
    * @param array $array
    *   The array to deduplicate.
@@ -73,17 +73,45 @@ abstract class NormalizerBase extends SerializationNormalizerBase implements Den
    * @return array
    *   The deduplicated array.
    */
-  protected static function deduplicateTypes(array $array): array {
+  protected static function deduplicateTypesAndReferences(array $array): array {
     if (isset($array['@graph'])) {
       // Should only be run on a top level Jsonld array.
-      foreach ($array['@graph'] as $key => $value) {
-        if (isset($array['@graph'][$key]['@type']) && is_array($array['@graph'][$key]['@type'])) {
-          // Deduplicate @types
-          $array['@graph'][$key]['@type'] = array_unique($array['@graph'][$key]['@type']);
+      foreach ($array['@graph'] as $object_key => $object_value) {
+        foreach ($object_value as $key => $values) {
+          if ($key == '@type' && is_array($values)) {
+            $array['@graph'][$object_key]['@type'] = array_unique($values);
+          }
+          elseif ($key != '@id' && is_array($array['@graph'][$object_key][$key])
+            && count($array['@graph'][$object_key][$key]) > 1) {
+            $array['@graph'][$object_key][$key] = self::deduplicateArrayOfIds($array['@graph'][$object_key][$key]);
+          }
         }
       }
     }
     return $array;
+  }
+
+  /**
+   * Deduplicate multi-dimensional array based on the `@id` value.
+   *
+   * @param array $array
+   *   The multi-dimensional array.
+   *
+   * @return array
+   *   The deduplicated multi-dimensional array.
+   */
+  private static function deduplicateArrayOfIds(array $array): array {
+    $temp_array = [];
+    if (!isset($array[0]['@id'])) {
+      // No @id key, so just return the original array.
+      return $array;
+    }
+    foreach ($array as $val) {
+      if (array_search($val['@id'], array_column($temp_array, '@id')) === FALSE) {
+        $temp_array[] = $val;
+      }
+    }
+    return $temp_array;
   }
 
 }

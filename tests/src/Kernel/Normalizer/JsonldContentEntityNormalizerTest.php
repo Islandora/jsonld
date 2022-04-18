@@ -127,8 +127,6 @@ class JsonldContentEntityNormalizerTest extends JsonldKernelTestBase {
 
     $normalized = $this->serializer->normalize($entity, $this->format);
 
-    // var_dump($expected);
-    // var_dump($normalized);
     $this->assertEquals($expected, $normalized, "Did not normalize correctly.");
   }
 

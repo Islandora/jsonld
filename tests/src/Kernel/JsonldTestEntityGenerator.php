@@ -244,12 +244,15 @@ class JsonldTestEntityGenerator {
         ],
       ],
     ];
-    // If we mapped two entities to the same predicate we need to merge them.
+    // If we mapped two entities to the same predicate we remove one.
     if ($this->referableEntity1Predicate == $this->referrableEntity2Predicate) {
-      $expected['@graph'][0][self::DCTERMS_REFERENCES] = array_merge(
-        $expected['@graph'][0][self::DCTERMS_REFERENCES],
-        $expected['@graph'][0][self::DCTERMS_PUBLISHER]
-      );
+      if ($this->referrableEntity1 !== $this->referrableEntity2) {
+        // If there are two different entities referred to, then merge them.
+        $expected['@graph'][0][self::DCTERMS_REFERENCES] = array_merge(
+          $expected['@graph'][0][self::DCTERMS_REFERENCES],
+          $expected['@graph'][0][self::DCTERMS_PUBLISHER]
+        );
+      }
       unset($expected['@graph'][0][self::DCTERMS_PUBLISHER]);
     }
     // If the 2 referenced entities are different both need to have an entry.

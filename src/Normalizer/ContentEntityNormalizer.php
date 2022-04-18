@@ -170,8 +170,8 @@ class ContentEntityNormalizer extends NormalizerBase {
             $normalized_property,
           ]
         );
-        // Deduplicate the @type elements.
-        $normalized = self::deduplicateTypes($normalized);
+        // Deduplicate the @type elements and arrays of entity references.
+        $normalized = self::deduplicateTypesAndReferences($normalized);
       }
     }
     // Clean up @graph if this is the top-level entity

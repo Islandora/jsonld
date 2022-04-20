@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\jsonld\Kernel;
 
-use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\jsonld\Encoder\JsonldEncoder;
@@ -14,7 +13,6 @@ use Drupal\jsonld\Utils\JsonldNormalizerUtils;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\serialization\EntityResolver\ChainEntityResolver;
 use Drupal\serialization\EntityResolver\TargetIdResolver;
-use Drupal\user\Entity\User;
 use Symfony\Component\Serializer\Serializer;
 use Drupal\language\Entity\ConfigurableLanguage;
 
@@ -141,6 +139,9 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
       ])->setFieldMapping('field_test_entity_reference', [
         'properties' => ['dc:references'],
         'datatype' => 'xsd:nonNegativeInteger',
+      ])->setFieldMapping('field_test_entity_reference2', [
+        'properties' => ['dc:publisher'],
+        'datatype' => 'xsd:nonNegativeInteger',
       ])
       ->save();
 
@@ -174,6 +175,23 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
       'translatable' => FALSE,
     ])->save();
 
+    // Create the a second test entity reference field.
+    FieldStorageConfig::create([
+      'field_name' => 'field_test_entity_reference2',
+      'entity_type' => 'entity_test',
+      'type' => 'entity_reference',
+      'translatable' => FALSE,
+      'settings' => [
+        'target_type' => 'entity_test',
+      ],
+    ])->save();
+    FieldConfig::create([
+      'entity_type' => 'entity_test',
+      'field_name' => 'field_test_entity_reference2',
+      'bundle' => 'entity_test',
+      'translatable' => FALSE,
+    ])->save();
+
     $entity_manager = \Drupal::service('entity_type.manager');
     $link_manager = \Drupal::service('hal.link_manager');
     $uuid_resolver = \Drupal::service('serializer.entity_resolver.uuid');
@@ -197,129 +215,6 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
       new JsonldEncoder(),
     ];
     $this->serializer = new Serializer($normalizers, $encoders);
-  }
-
-  /**
-   * Generate a test entity and the expected normalized array.
-   *
-   * @return array
-   *   with [ the entity, the normalized array ].
-   *
-   * @throws \Drupal\Core\Entity\EntityStorageException
-   *   Problem saving the entity.
-   * @throws \Exception
-   *   Problem creating a DateTime.
-   */
-  protected function generateTestEntity() {
-    $target_entity = EntityTest::create([
-      'name' => $this->randomMachineName(),
-      'langcode' => 'en',
-      'field_test_entity_reference' => NULL,
-    ]);
-    $target_entity->getFieldDefinition('created')->setTranslatable(FALSE);
-    $target_entity->getFieldDefinition('user_id')->setTranslatable(FALSE);
-    $target_entity->save();
-
-    $target_user = User::create([
-      'name' => $this->randomMachineName(),
-      'langcode' => 'en',
-    ]);
-    $target_user->save();
-
-    rdf_get_mapping('entity_test', 'entity_test')->setBundleMapping(
-      [
-        'types' => [
-          "schema:ImageObject",
-        ],
-      ])->setFieldMapping('field_test_text', [
-        'properties' => ['dc:description'],
-      ])->setFieldMapping('user_id', [
-        'properties' => ['schema:author'],
-      ])->setFieldMapping('modified', [
-        'properties' => ['schema:dateModified'],
-        'datatype' => 'xsd:dateTime',
-      ])->save();
-
-    $tz = new \DateTimeZone('UTC');
-    $dt = new \DateTime(NULL, $tz);
-    $created = $dt->format("U");
-    $created_iso = $dt->format(\DateTime::W3C);
-    // Create an entity.
-    $values = [
-      'langcode' => 'en',
-      'name' => $this->randomMachineName(),
-      'type' => 'entity_test',
-      'bundle' => 'entity_test',
-      'user_id' => $target_user->id(),
-      'created' => [
-        'value' => $created,
-      ],
-      'field_test_text' => [
-        'value' => $this->randomMachineName(),
-        'format' => 'full_html',
-      ],
-      'field_test_entity_reference' => [
-        'target_id' => $target_entity->id(),
-      ],
-    ];
-
-    $entity = EntityTest::create($values);
-    $entity->save();
-
-    $id = "http://localhost/entity_test/" . $entity->id() . "?_format=jsonld";
-    $target_id = "http://localhost/entity_test/" . $target_entity->id() . "?_format=jsonld";
-    $user_id = "http://localhost/user/" . $target_user->id() . "?_format=jsonld";
-
-    $expected = [
-      "@graph" => [
-        [
-          "@id" => $id,
-          "@type" => [
-            'http://schema.org/ImageObject',
-          ],
-          "http://purl.org/dc/terms/references" => [
-            [
-              "@id" => $target_id,
-            ],
-          ],
-          "http://purl.org/dc/terms/description" => [
-            [
-              "@value" => $values['field_test_text']['value'],
-              "@language" => "en",
-            ],
-          ],
-          "http://purl.org/dc/terms/title" => [
-            [
-              "@language" => "en",
-              "@value" => $values['name'],
-            ],
-          ],
-          "http://schema.org/author" => [
-            [
-              "@id" => $user_id,
-            ],
-          ],
-          "http://schema.org/dateCreated" => [
-            [
-              "@type" => "http://www.w3.org/2001/XMLSchema#dateTime",
-              "@value" => $created_iso,
-            ],
-          ],
-        ],
-        [
-          "@id" => $user_id,
-          "@type" => "http://localhost/rest/type/user/user",
-        ],
-        [
-          "@id" => $target_id,
-          "@type" => [
-            "http://schema.org/ImageObject",
-          ],
-        ],
-      ],
-    ];
-
-    return [$entity, $expected];
   }
 
 }

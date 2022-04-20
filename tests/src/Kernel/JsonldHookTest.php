@@ -37,7 +37,7 @@ class JsonldHookTest extends JsonldKernelTestBase {
    */
   public function testAlterNormalizedJsonld() {
 
-    list($entity, $expected) = $this->generateTestEntity();
+    list($entity, $expected) = JsonldTestEntityGenerator::create()->generateNewEntity();
     $expected['@graph'][] = [
       "@id" => "json_alter_normalize_hooks",
       "http://purl.org/dc/elements/1.1/title" => "The hook is tested.",

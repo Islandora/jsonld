@@ -102,12 +102,8 @@ abstract class NormalizerBase extends SerializationNormalizerBase implements Den
    */
   private static function deduplicateArrayOfIds(array $array): array {
     $temp_array = [];
-    if (!isset($array[0]['@id'])) {
-      // No @id key, so just return the original array.
-      return $array;
-    }
     foreach ($array as $val) {
-      if (array_search($val['@id'], array_column($temp_array, '@id')) === FALSE) {
+      if (!array_key_exists('@id', $val) || array_search($val['@id'], array_column($temp_array, '@id')) === FALSE) {
         $temp_array[] = $val;
       }
     }

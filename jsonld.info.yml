@@ -4,6 +4,6 @@ description: 'Serializes entities to JSON-LD / LDP for the Islandora Project'
 package: Web services
 core_version_requirement: ">=9.4"
 dependencies:
-  - drupal:hal-hal
+  - drupal:hal
   - drupal:serialization
   - drupal:rdf

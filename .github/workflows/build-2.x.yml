@@ -22,11 +22,18 @@ jobs:
     strategy:
       matrix:
         php-versions: ["7.4", "8.0", "8.1"]
-        drupal-version: ["9.3.x", "9.4.x-dev"]
+        drupal-version: ["9.3.x", "9.4.x", "9.5.x-dev"]
+
+    env:
+      DRUPAL_VERSION: ${{ matrix.drupal-version }}
+      SCRIPT_DIR: ${{ github.workspace }}/islandora_ci
+      DRUPAL_DIR: /opt/drupal
+      DRUPAL_WEB_ROOT: /opt/drupal/web
+      PHPUNIT_FILE: ${{ github.workspace }}/build_dir/phpunit.xml
 
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: drupal
@@ -39,7 +46,6 @@ jobs:
           - 61616:61616
           - 61613:61613
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
@@ -64,13 +70,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y mysql-client
-
-      - name: Set environment variables
-        run: |
-          echo "DRUPAL_VERSION=${{ matrix.drupal-version }}" >> $GITHUB_ENV
-          echo "SCRIPT_DIR=$GITHUB_WORKSPACE/islandora_ci" >> $GITHUB_ENV
-          echo "DRUPAL_DIR=/opt/drupal" >> $GITHUB_ENV
-          echo "PHPUNIT_FILE=$GITHUB_WORKSPACE/build_dir/phpunit.xml" >> $GITHUB_ENV
 
       - name: Cache Composer dependencies
         uses: actions/cache@v2
@@ -105,6 +104,7 @@ jobs:
       - name: Test scripts
         run: $SCRIPT_DIR/travis_scripts.sh
 
+        # Unit test config is defined in the module's phpunit.xml file.
       - name: PHPUNIT tests
         run: |
           cd $DRUPAL_DIR/web/core

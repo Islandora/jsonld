@@ -18,6 +18,7 @@ class EntityReferenceConverter {
    *   An array of arguments defined in the mapping.
    *   Expected keys are:
    *     - link_field: The field used to store the URI we will use.
+   *     - pass_target_id: (true/false) If it should return a target ID when no term is found.
    *
    * @return mixed
    *   Either the replaced URI string OR the targeted entity if no URI.
@@ -35,9 +36,12 @@ class EntityReferenceConverter {
       elseif ($ent) {
         return $ent->get('name')->value;
       }
+      elseif (array_key_exists('pass_target_id', $arguments) && $arguments['pass_target_id']) {
+        return $target['target_id'];
+      }
     }
-    // We don't have a value to pass, so don't bother converting.
-    return $target;
+    // Nothing worked, so return nothing.
+    return '';
   }
 
 }

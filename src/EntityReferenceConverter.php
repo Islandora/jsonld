@@ -18,7 +18,8 @@ class EntityReferenceConverter {
    *   An array of arguments defined in the mapping.
    *   Expected keys are:
    *     - link_field: The field used to store the URI we will use.
-   *     - pass_target_id: (true/false) If it should return a target ID when no term is found.
+   *     - pass_target_id: (true/false) If it should return a target ID
+   *       when no term is found.
    *
    * @return mixed
    *   Either the replaced URI string OR the targeted entity if no URI.

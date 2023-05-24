@@ -21,7 +21,8 @@
     ],
     "require" : {
         "php": ">=7.4",
-        "drupal/hal": "^1.0"
+        "drupal/hal": "^1||^2"
+        "drupal/rdf": "^2.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^8",

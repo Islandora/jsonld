@@ -5,7 +5,9 @@
 
 ## Introduction
 
-JSON-LD Serializer for Drupal 8 and Islandora.
+JSON-LD Serializer for Drupal 10 and Islandora.
+
+NOTE: This 3.x branch is compatible with Drupal 10. For progress in D10 compatibility with the rest of Islandora, see [ticket](https://github.com/Islandora/documentation/issues/2235).
 
 This module adds a simple Drupal entity to JSON-LD 
 `normalizer/serializer/unserializer` service provider and a few supporting 

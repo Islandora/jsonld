@@ -22,7 +22,7 @@ class JsonldEncoder extends SymfonyJsonEncoder {
   /**
    * {@inheritdoc}
    */
-  public function supportsEncoding($format) {
+  public function supportsEncoding(string $format): bool {
 
     return $format == $this->format;
   }
@@ -30,7 +30,7 @@ class JsonldEncoder extends SymfonyJsonEncoder {
   /**
    * {@inheritdoc}
    */
-  public function supportsDecoding($format) {
+  public function supportsDecoding(string $format): bool {
 
     return $format == $this->format;
   }

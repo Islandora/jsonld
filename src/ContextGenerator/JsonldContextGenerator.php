@@ -333,9 +333,8 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
     // yet for this instance.
     if (empty($this->fieldMappings)) {
       // Cribbed from rdf module's rdf_get_namespaces.
-      foreach (\Drupal::moduleHandler()->getImplementations(self::FIELD_MAPPPINGS_HOOK) as $module) {
-        $function = $module . '_' . self::FIELD_MAPPPINGS_HOOK;
-        foreach ($function() as $field => $mapping) {
+      \Drupal::moduleHandler()->invokeAllWith(self::FIELD_MAPPPINGS_HOOK, function (callable $hook, string $module) {
+        foreach ($hook() as $field => $mapping) {
           if (array_key_exists($field, $this->fieldMappings)) {
             $this->logger->warning(
               t('Tried to map @field_type to @new_type, but @field_type is already mapped to @orig_type.', [
@@ -349,7 +348,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
             $this->fieldMappings[$field] = $mapping;
           }
         }
-      }
+      });
     }
     return array_key_exists($field_type, $this->fieldMappings) ? $this->fieldMappings[$field_type] : $default_mapping;
   }

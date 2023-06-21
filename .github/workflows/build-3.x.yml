@@ -6,9 +6,9 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the 8.x branch
   push:
-    branches: [ 2.x ]
+    branches: [ 3.x ]
   pull_request:
-    branches: [ 2.x ]
+    branches: [ 3.x ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -21,8 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ["8.0", "8.1"]
-        drupal-version: ["9.5.x"]
+        php-versions: ["8.1"]
+        drupal-version: ["10.0.x", "10.1.x-dev"]
 
     env:
       DRUPAL_VERSION: ${{ matrix.drupal-version }}

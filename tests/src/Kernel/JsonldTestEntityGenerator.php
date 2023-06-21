@@ -158,7 +158,7 @@ class JsonldTestEntityGenerator {
    *   Error saving the entity.
    */
   public function generateNewEntity(): array {
-    $dt = new \DateTime(NULL, new \DateTimeZone('UTC'));
+    $dt = new \DateTime('now', new \DateTimeZone('UTC'));
     $created = $dt->format("U");
     $created_iso = $dt->format(\DateTime::W3C);
     // Create an entity.

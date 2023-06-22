@@ -94,7 +94,7 @@ class JsonldContextGeneratorTest extends BrowserTestBase {
     );
     $this->drupalGet($url);
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertEquals($this->drupalGetHeader('Content-Type'), 'application/ld+json', 'Correct JSON-LD mime type was returned');
+    $this->assertEquals($this->getSession()->getResponseHeader('Content-Type'), 'application/ld+json', 'Correct JSON-LD mime type was returned');
   }
 
   /**
@@ -121,7 +121,7 @@ class JsonldContextGeneratorTest extends BrowserTestBase {
     $this->drupalGet($url);
     $this->assertSession()->statusCodeEquals(200);
     $jsonldarray = json_decode($this->getSession()->getPage()->getContent(), TRUE);
-    $this->verbose($jsonldarray);
+    dump($jsonldarray);
     $this->assertEquals($expected, $jsonldarray, "Returned @context matches expected response.");
   }
 

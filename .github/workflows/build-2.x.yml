@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         php-versions: ["7.4", "8.0", "8.1"]
-        drupal-version: ["9.3.x", "9.4.x", "9.5.x-dev"]
+        drupal-version: ["9.4.x", "9.5.x-dev"]
 
     env:
       DRUPAL_VERSION: ${{ matrix.drupal-version }}

@@ -20,7 +20,7 @@
         }
     ],
     "require" : {
-        "php": ">=7.4",
+        "drupal/core": "^10",
         "drupal/hal": "^1||^2",
         "drupal/rdf": "^2.1"
     },

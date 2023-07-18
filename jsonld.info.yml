@@ -2,8 +2,8 @@ name: 'JSON-LD'
 type: module
 description: 'Serializes entities to JSON-LD / LDP for the Islandora Project'
 package: Web services
-core_version_requirement: ^9
+core_version_requirement: ^9.4
 dependencies:
-  - hal
-  - serialization
-  - rdf
+  - drupal:serialization
+  - hal:hal
+  - rdf:rdf

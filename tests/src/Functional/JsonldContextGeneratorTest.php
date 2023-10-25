@@ -42,7 +42,7 @@ class JsonldContextGeneratorTest extends BrowserTestBase {
     // Create a test content type.
     $test_type = $this->container->get('entity_type.manager')->getStorage('node_type')->create([
       'type' => 'test_type',
-      'label' => 'Test Type',
+      'name' => 'Test Type',
     ]);
     $test_type->save();
 

@@ -21,8 +21,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ["8.1", "8.2"]
-        drupal-version: ["10.0.x", "10.1.x", "10.2.x-dev"]
+        php-versions: ["8.1", "8.2", "8.3"]
+        drupal-version: ["10.1.x", "10.2.x", "10.3.x-dev"]
+        exclude: 
+          - php-versions: "8.3"
+            drupal-version: "10.1.x"
 
     env:
       DRUPAL_VERSION: ${{ matrix.drupal-version }}

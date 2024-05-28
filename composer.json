@@ -19,6 +19,9 @@
             "role": "Maintainer"
         }
     ],
+    "replace": {
+      "islandora/jsonld": "self.version"
+    },
     "require" : {
         "drupal/core": "^10",
         "drupal/hal": "^1||^2",

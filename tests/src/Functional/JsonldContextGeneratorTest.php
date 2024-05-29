@@ -121,7 +121,6 @@ class JsonldContextGeneratorTest extends BrowserTestBase {
     $this->drupalGet($url);
     $this->assertSession()->statusCodeEquals(200);
     $jsonldarray = json_decode($this->getSession()->getPage()->getContent(), TRUE);
-    dump($jsonldarray);
     $this->assertEquals($expected, $jsonldarray, "Returned @context matches expected response.");
   }
 

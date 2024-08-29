@@ -1,5 +1,5 @@
 {
-    "name": "islandora/jsonld",
+    "name": "drupal/jsonld",
     "description": "JSON-LD serializer for Drupal",
     "type": "drupal-module",
     "license": "GPL-2.0+",

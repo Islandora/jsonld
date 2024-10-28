@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         php-versions: ["8.1", "8.2", "8.3"]
-        drupal-version: ["10.2.x", "10.3.x", "10.4.x-dev", "11.0.x"]
+        drupal-version: ["10.3.x", "10.4.x-dev", "11.0.x"]
         exclude:
           - drupal-version: "11.0.x"
             php-versions: "8.1"

@@ -112,4 +112,4 @@ jobs:
       - name: PHPUNIT tests
         run: |
           cd $DRUPAL_DIR/web/core
-          $DRUPAL_DIR/vendor/bin/phpunit --verbose --debug
+          $DRUPAL_DIR/vendor/bin/phpunit --debug

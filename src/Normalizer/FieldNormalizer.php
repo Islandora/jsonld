@@ -21,7 +21,7 @@ class FieldNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function normalize($field, $format = NULL, array $context = []) {
+  public function normalize($field, $format = NULL, array $context = []): array|bool|string|int|float|null|\ArrayObject {
 
     $normalized_field_items = [];
 

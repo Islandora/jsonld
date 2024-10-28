@@ -77,7 +77,7 @@ class ContentEntityNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function normalize($entity, $format = NULL, array $context = []) {
+  public function normalize($entity, $format = NULL, array $context = []): array|bool|string|int|float|null|\ArrayObject {
 
     // We need to make sure that this only runs for JSON-LD.
     // @todo check $format before going RDF crazy

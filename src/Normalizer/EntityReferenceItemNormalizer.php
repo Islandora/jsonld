@@ -55,7 +55,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
   /**
    * {@inheritdoc}
    */
-  public function normalize($field_item, $format = NULL, array $context = []) {
+  public function normalize($field_item, $format = NULL, array $context = []): array|bool|string|int|float|null|\ArrayObject {
 
     /** @var \Drupal\Core\Field\FieldItemInterface $field_item */
     $target_entity = $field_item->get('entity')->getValue();

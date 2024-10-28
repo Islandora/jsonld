@@ -38,7 +38,7 @@ class FieldItemNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function normalize($field_item, $format = NULL, array $context = []) {
+  public function normalize($field_item, $format = NULL, array $context = []): array|bool|string|int|float|null|\ArrayObject {
 
     // @todo Understand Drupal complex fields to RDF mapping
     // Fields can be complex, with multiple subfields

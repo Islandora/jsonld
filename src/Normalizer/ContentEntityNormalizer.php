@@ -195,7 +195,7 @@ class ContentEntityNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
+  public function denormalize(mixed $data, string $class, ?string $format = NULL, array $context = []) : mixed {
 
     // Get type, necessary for determining which bundle to create.
     if (!isset($data['_links']['type'])) {

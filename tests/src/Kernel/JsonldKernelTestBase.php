@@ -116,8 +116,6 @@ abstract class JsonldKernelTestBase extends KernelTestBase {
       $class = get_parent_class($class);
     }
 
-    $this->installSchema('system', ['sequences']);
-
     $types = ['schema:Thing'];
     $created_mapping = [
       'properties' => ['schema:dateCreated'],

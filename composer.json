@@ -23,7 +23,6 @@
         "islandora/jsonld": "self.version"
     },
     "require" : {
-        "drupal/core": "^10",
         "drupal/hal": "^1||^2",
         "drupal/rdf": "^2.1"
     },

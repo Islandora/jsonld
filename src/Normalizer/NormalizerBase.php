@@ -20,7 +20,7 @@ abstract class NormalizerBase extends SerializationNormalizerBase implements Den
   /**
    * {@inheritdoc}
    */
-  public function supportsNormalization($data, string $format = NULL, array $context = []): bool {
+  public function supportsNormalization(mixed $data, ?string $format = NULL, array $context = []): bool {
 
     return in_array($format, $this->formats) && parent::supportsNormalization($data, $format);
   }
@@ -28,7 +28,7 @@ abstract class NormalizerBase extends SerializationNormalizerBase implements Den
   /**
    * {@inheritdoc}
    */
-  public function supportsDenormalization($data, string $type, string $format = NULL, array $context = []): bool {
+  public function supportsDenormalization($data, string $type, ?string $format = NULL, array $context = []): bool {
 
     if (in_array($format, $this->formats) && (class_exists($this->supportedInterfaceOrClass) || interface_exists($this->supportedInterfaceOrClass))) {
       $target = new \ReflectionClass($type);

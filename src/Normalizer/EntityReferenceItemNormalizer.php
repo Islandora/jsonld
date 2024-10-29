@@ -3,6 +3,7 @@
 namespace Drupal\jsonld\Normalizer;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\hal\LinkManager\LinkManagerInterface;
 use Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface;
 use Drupal\serialization\EntityResolver\EntityResolverInterface;
@@ -176,6 +177,15 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
       }
       return $uuid;
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      EntityReferenceItem::class => TRUE,
+    ];
   }
 
 }

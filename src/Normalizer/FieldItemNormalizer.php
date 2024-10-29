@@ -210,4 +210,13 @@ class FieldItemNormalizer extends NormalizerBase {
     return $entity_translation->get($field_name)->appendItem();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      FieldItemInterface::class => TRUE,
+    ];
+  }
+
 }

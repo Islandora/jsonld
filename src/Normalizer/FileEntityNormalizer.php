@@ -5,6 +5,7 @@ namespace Drupal\jsonld\Normalizer;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\file\FileInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
 use Drupal\jsonld\Utils\JsonldNormalizerUtilsInterface;
 use GuzzleHttp\ClientInterface;
@@ -87,6 +88,15 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
     $data['uri'] = $this->fileSystem->saveData($file_data, $path);
 
     return $this->entityManager->getStorage('file')->create($data);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      FileInterface::class => TRUE,
+    ];
   }
 
 }

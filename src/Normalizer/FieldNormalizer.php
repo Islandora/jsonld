@@ -110,4 +110,13 @@ class FieldNormalizer extends NormalizerBase {
     return $normalized_field_items;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      FieldItemListInterface::class => TRUE,
+    ];
+  }
+
 }

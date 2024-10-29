@@ -3,6 +3,7 @@
 namespace Drupal\jsonld\Normalizer;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
@@ -302,6 +303,15 @@ class ContentEntityNormalizer extends NormalizerBase {
     }
 
     return $typed_data_ids;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      ContentEntityInterface::class => TRUE,
+    ];
   }
 
 }

@@ -2,14 +2,14 @@
 
 namespace Drupal\jsonld\ContextGenerator;
 
-use Drupal\Core\Entity\EntityFieldManagerInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\rdf\RdfMappingInterface;
 use Drupal\rdf\Entity\RdfMapping;
+use Drupal\rdf\RdfMappingInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -206,7 +206,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
 
       // Now we start overriding from config entity defined mappings.
       // Assume all non defined mapping types as "property".
-      $reltype = isset($fieldRDFMapping['mapping_type']) ? $fieldRDFMapping['mapping_type'] : 'property';
+      $reltype = $fieldRDFMapping['mapping_type'] ?? 'property';
 
       if (isset($fieldRDFMapping['datatype']) && ($reltype == 'property')) {
         $termDefinition = ['@type' => $fieldRDFMapping['datatype']];
@@ -277,7 +277,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
    *   And array with the entity type and the bundle id
    */
   protected function entityBundleIdsSplitter($ids) {
-    list($entity_type_id, $bundle_id) = explode(".", $ids, 2);
+    [$entity_type_id, $bundle_id] = explode(".", $ids, 2);
     return ['entityTypeId' => $entity_type_id, 'bundleId' => $bundle_id];
   }
 
@@ -297,7 +297,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
    */
   protected function parseCompactedIri($iri) {
     // As naive as it gets.
-    list($prefix, $rest) = array_pad(explode(":", $iri, 2), 2, '');
+    [$prefix, $rest] = array_pad(explode(":", $iri, 2), 2, '');
     if ((substr($rest, 0, 2) == "//") || ($prefix == $iri)) {
       // Means this was never a compacted IRI.
       return ['prefix' => NULL, 'term' => $iri];

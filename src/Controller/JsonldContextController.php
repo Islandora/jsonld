@@ -2,15 +2,15 @@
 
 namespace Drupal\jsonld\Controller;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableJsonResponse;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface;
+use Drupal\rdf\Entity\RdfMapping;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Drupal\rdf\Entity\RdfMapping;
-use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * Controller for retrieving jsonld contexts.

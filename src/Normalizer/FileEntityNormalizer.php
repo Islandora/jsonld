@@ -52,12 +52,14 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
    * @param \Drupal\jsonld\Utils\JsonldNormalizerUtilsInterface $normalizer_utils
    *   The json-ld normalizer utils.
    */
-  public function __construct(EntityTypeManagerInterface $entity_manager,
-                              ClientInterface $http_client,
-                              LinkManagerInterface $link_manager,
-                              ModuleHandlerInterface $module_handler,
-                              FileSystemInterface $file_system,
-                              JsonldNormalizerUtilsInterface $normalizer_utils) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_manager,
+    ClientInterface $http_client,
+    LinkManagerInterface $link_manager,
+    ModuleHandlerInterface $module_handler,
+    FileSystemInterface $file_system,
+    JsonldNormalizerUtilsInterface $normalizer_utils,
+  ) {
 
     parent::__construct($link_manager, $entity_manager, $module_handler, $normalizer_utils);
 

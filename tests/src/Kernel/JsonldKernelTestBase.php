@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\jsonld\Kernel;
 
+use Drupal\KernelTests\KernelTestBase;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\jsonld\Encoder\JsonldEncoder;
@@ -10,11 +11,10 @@ use Drupal\jsonld\Normalizer\EntityReferenceItemNormalizer;
 use Drupal\jsonld\Normalizer\FieldItemNormalizer;
 use Drupal\jsonld\Normalizer\FieldNormalizer;
 use Drupal\jsonld\Utils\JsonldNormalizerUtils;
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\serialization\EntityResolver\ChainEntityResolver;
 use Drupal\serialization\EntityResolver\TargetIdResolver;
 use Symfony\Component\Serializer\Serializer;
-use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Base class for Json-LD Kernel tests.

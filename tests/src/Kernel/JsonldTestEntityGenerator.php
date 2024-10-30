@@ -2,8 +2,8 @@
 
 namespace Drupal\Tests\jsonld\Kernel;
 
-use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\RandomGeneratorTrait;
+use Drupal\entity_test\Entity\EntityTest;
 use Drupal\user\Entity\User;
 
 /**

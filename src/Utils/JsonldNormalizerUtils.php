@@ -51,7 +51,7 @@ class JsonldNormalizerUtils implements JsonldNormalizerUtilsInterface {
   public function __construct(
     ConfigFactoryInterface $config_factory,
     LanguageManagerInterface $language_manager,
-    RouteProviderInterface $route_provider
+    RouteProviderInterface $route_provider,
   ) {
     $this->config = $config_factory->get(JsonLdSettingsForm::CONFIG_NAME);
     $this->languageManager = $language_manager;

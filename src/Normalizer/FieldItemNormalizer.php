@@ -57,14 +57,14 @@ class FieldItemNormalizer extends NormalizerBase {
     }
     else {
       // Set the uri here, and then convert it to '@id' later on.
-      $values_clean['@value'] = isset($values['value']) ? $values['value'] : $values['uri'];
+      $values_clean['@value'] = $values['value'] ?? $values['uri'];
       if (isset($context['current_entity_rdf_mapping'])) {
         // So why i am passing the whole rdf mapping object and not
         // only the predicate? Well because i hope i will be able
         // to MAP to RDF also sub fields of a complex field someday
         // and somehow.
         $field_mappings = $context['current_entity_rdf_mapping']->getPreparedFieldMapping($field->getName());
-        $field_keys = isset($field_mappings['properties']) ? $field_mappings['properties'] : [$field->getName()];
+        $field_keys = $field_mappings['properties'] ?? [$field->getName()];
 
         if (!empty($field_mappings['datatype'])) {
           $values_clean['@type'] = $field_mappings['datatype'];
@@ -76,7 +76,7 @@ class FieldItemNormalizer extends NormalizerBase {
         // For now this is a dirty solution.
         if (!empty($field_mappings['datatype_callback'])) {
           $callback = $field_mappings['datatype_callback']['callable'];
-          $arguments = isset($field_mappings['datatype_callback']['arguments']) ? $field_mappings['datatype_callback']['arguments'] : NULL;
+          $arguments = $field_mappings['datatype_callback']['arguments'] ?? NULL;
           $values_clean['@value'] = call_user_func($callback, $values, $arguments);
         }
         $field_context = $this->jsonldContextgenerator->getFieldsRdf(

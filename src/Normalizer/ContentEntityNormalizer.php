@@ -64,10 +64,12 @@ class ContentEntityNormalizer extends NormalizerBase {
    * @param \Drupal\Jsonld\Utils\JsonldNormalizerUtilsInterface $normalizer_utils
    *   The json-ld normalizer utilities.
    */
-  public function __construct(LinkManagerInterface $link_manager,
-                              EntityTypeManagerInterface $entity_manager,
-                              ModuleHandlerInterface $module_handler,
-                              JsonldNormalizerUtilsInterface $normalizer_utils) {
+  public function __construct(
+    LinkManagerInterface $link_manager,
+    EntityTypeManagerInterface $entity_manager,
+    ModuleHandlerInterface $module_handler,
+    JsonldNormalizerUtilsInterface $normalizer_utils,
+  ) {
 
     $this->linkManager = $link_manager;
     $this->entityManager = $entity_manager;

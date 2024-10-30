@@ -3,6 +3,7 @@
 namespace Drupal\jsonld\Normalizer;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\hal\LinkManager\LinkManagerInterface;
@@ -63,10 +64,12 @@ class ContentEntityNormalizer extends NormalizerBase {
    * @param \Drupal\Jsonld\Utils\JsonldNormalizerUtilsInterface $normalizer_utils
    *   The json-ld normalizer utilities.
    */
-  public function __construct(LinkManagerInterface $link_manager,
-                              EntityTypeManagerInterface $entity_manager,
-                              ModuleHandlerInterface $module_handler,
-                              JsonldNormalizerUtilsInterface $normalizer_utils) {
+  public function __construct(
+    LinkManagerInterface $link_manager,
+    EntityTypeManagerInterface $entity_manager,
+    ModuleHandlerInterface $module_handler,
+    JsonldNormalizerUtilsInterface $normalizer_utils,
+  ) {
 
     $this->linkManager = $link_manager;
     $this->entityManager = $entity_manager;
@@ -77,7 +80,7 @@ class ContentEntityNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function normalize($entity, $format = NULL, array $context = []) {
+  public function normalize($entity, $format = NULL, array $context = []): array|bool|string|int|float|null|\ArrayObject {
 
     // We need to make sure that this only runs for JSON-LD.
     // @todo check $format before going RDF crazy
@@ -195,7 +198,7 @@ class ContentEntityNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
+  public function denormalize(mixed $data, string $class, ?string $format = NULL, array $context = []) : mixed {
 
     // Get type, necessary for determining which bundle to create.
     if (!isset($data['_links']['type'])) {
@@ -302,6 +305,15 @@ class ContentEntityNormalizer extends NormalizerBase {
     }
 
     return $typed_data_ids;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      ContentEntityInterface::class => TRUE,
+    ];
   }
 
 }

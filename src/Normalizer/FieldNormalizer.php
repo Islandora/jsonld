@@ -21,7 +21,7 @@ class FieldNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function normalize($field, $format = NULL, array $context = []) {
+  public function normalize($field, $format = NULL, array $context = []): array|bool|string|int|float|null|\ArrayObject {
 
     $normalized_field_items = [];
 
@@ -62,7 +62,7 @@ class FieldNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
+  public function denormalize(mixed $data, string $class, ?string $format = NULL, array $context = []) : mixed {
 
     if (!isset($context['target_instance'])) {
       throw new InvalidArgumentException('$context[\'target_instance\'] must be set to denormalize with the FieldNormalizer');
@@ -108,6 +108,15 @@ class FieldNormalizer extends NormalizerBase {
       }
     }
     return $normalized_field_items;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      FieldItemListInterface::class => TRUE,
+    ];
   }
 
 }

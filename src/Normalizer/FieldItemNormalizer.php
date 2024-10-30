@@ -38,7 +38,7 @@ class FieldItemNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function normalize($field_item, $format = NULL, array $context = []) {
+  public function normalize($field_item, $format = NULL, array $context = []): array|bool|string|int|float|null|\ArrayObject {
 
     // @todo Understand Drupal complex fields to RDF mapping
     // Fields can be complex, with multiple subfields
@@ -57,14 +57,14 @@ class FieldItemNormalizer extends NormalizerBase {
     }
     else {
       // Set the uri here, and then convert it to '@id' later on.
-      $values_clean['@value'] = isset($values['value']) ? $values['value'] : $values['uri'];
+      $values_clean['@value'] = $values['value'] ?? $values['uri'];
       if (isset($context['current_entity_rdf_mapping'])) {
         // So why i am passing the whole rdf mapping object and not
         // only the predicate? Well because i hope i will be able
         // to MAP to RDF also sub fields of a complex field someday
         // and somehow.
         $field_mappings = $context['current_entity_rdf_mapping']->getPreparedFieldMapping($field->getName());
-        $field_keys = isset($field_mappings['properties']) ? $field_mappings['properties'] : [$field->getName()];
+        $field_keys = $field_mappings['properties'] ?? [$field->getName()];
 
         if (!empty($field_mappings['datatype'])) {
           $values_clean['@type'] = $field_mappings['datatype'];
@@ -76,7 +76,7 @@ class FieldItemNormalizer extends NormalizerBase {
         // For now this is a dirty solution.
         if (!empty($field_mappings['datatype_callback'])) {
           $callback = $field_mappings['datatype_callback']['callable'];
-          $arguments = isset($field_mappings['datatype_callback']['arguments']) ? $field_mappings['datatype_callback']['arguments'] : NULL;
+          $arguments = $field_mappings['datatype_callback']['arguments'] ?? NULL;
           $values_clean['@value'] = call_user_func($callback, $values, $arguments);
         }
         $field_context = $this->jsonldContextgenerator->getFieldsRdf(
@@ -138,7 +138,7 @@ class FieldItemNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
+  public function denormalize(mixed $data, string $class, ?string $format = NULL, array $context = []) : mixed {
 
     if (!isset($context['target_instance'])) {
       throw new InvalidArgumentException('$context[\'target_instance\'] must be set to denormalize with the FieldItemNormalizer');
@@ -208,6 +208,15 @@ class FieldItemNormalizer extends NormalizerBase {
     $entity_translation = $entity->hasTranslation($langcode) ? $entity->getTranslation($langcode) : $entity->addTranslation($langcode);
     $field_name = $item->getFieldDefinition()->getName();
     return $entity_translation->get($field_name)->appendItem();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      FieldItemInterface::class => TRUE,
+    ];
   }
 
 }

@@ -33,7 +33,7 @@ class JsonldContentEntityNormalizerTest extends JsonldKernelTestBase {
    */
   public function testSimpleNormalizeJsonld() {
 
-    list($entity, $expected) = JsonldTestEntityGenerator::create()->generateNewEntity();
+    [$entity, $expected] = JsonldTestEntityGenerator::create()->generateNewEntity();
 
     $normalized = $this->serializer->normalize($entity, $this->format);
     $this->assertEquals($expected, $normalized, "Did not normalize correctly.");
@@ -52,7 +52,7 @@ class JsonldContentEntityNormalizerTest extends JsonldKernelTestBase {
    */
   public function testLocalizedNormalizeJsonld() {
 
-    list($entity, $expected) = JsonldTestEntityGenerator::create()->generateNewEntity();
+    [$entity, $expected] = JsonldTestEntityGenerator::create()->generateNewEntity();
 
     $existing_entity_values = $entity->toArray();
     $target_entity_tl_id = $existing_entity_values['field_test_entity_reference'][0]['target_id'];
@@ -96,7 +96,7 @@ class JsonldContentEntityNormalizerTest extends JsonldKernelTestBase {
    */
   public function testDeduplicateEntityReferenceMappings(): void {
 
-    list($entity, $expected) = JsonldTestEntityGenerator::create()->makeDuplicateReferenceMapping()->generateNewEntity();
+    [$entity, $expected] = JsonldTestEntityGenerator::create()->makeDuplicateReferenceMapping()->generateNewEntity();
 
     $normalized = $this->serializer->normalize($entity, $this->format);
 
@@ -108,7 +108,7 @@ class JsonldContentEntityNormalizerTest extends JsonldKernelTestBase {
    */
   public function testDeduplicateEntityReferenceIds(): void {
 
-    list($entity, $expected) = JsonldTestEntityGenerator::create()->makeDuplicateReference()->generateNewEntity();
+    [$entity, $expected] = JsonldTestEntityGenerator::create()->makeDuplicateReference()->generateNewEntity();
 
     $normalized = $this->serializer->normalize($entity, $this->format);
 
@@ -122,7 +122,7 @@ class JsonldContentEntityNormalizerTest extends JsonldKernelTestBase {
    *  - sharing the same RDF mapping.
    */
   public function testDuplicateEntityReferenceAndMappings(): void {
-    list($entity, $expected) = JsonldTestEntityGenerator::create()->makeDuplicateReference()->makeDuplicateReferenceMapping()
+    [$entity, $expected] = JsonldTestEntityGenerator::create()->makeDuplicateReference()->makeDuplicateReferenceMapping()
       ->generateNewEntity();
 
     $normalized = $this->serializer->normalize($entity, $this->format);

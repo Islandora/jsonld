@@ -3,6 +3,7 @@
 namespace Drupal\jsonld\Normalizer;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\hal\LinkManager\LinkManagerInterface;
 use Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface;
 use Drupal\serialization\EntityResolver\EntityResolverInterface;
@@ -44,9 +45,11 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
    * @param \Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface $jsonld_context
    *   The Json-Ld context service.
    */
-  public function __construct(LinkManagerInterface $link_manager,
-  EntityResolverInterface $entity_Resolver,
-                              JsonldContextGeneratorInterface $jsonld_context) {
+  public function __construct(
+    LinkManagerInterface $link_manager,
+    EntityResolverInterface $entity_Resolver,
+    JsonldContextGeneratorInterface $jsonld_context,
+  ) {
     parent::__construct($jsonld_context);
     $this->linkManager = $link_manager;
     $this->entityResolver = $entity_Resolver;
@@ -55,7 +58,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
   /**
    * {@inheritdoc}
    */
-  public function normalize($field_item, $format = NULL, array $context = []) {
+  public function normalize($field_item, $format = NULL, array $context = []): array|bool|string|int|float|null|\ArrayObject {
 
     /** @var \Drupal\Core\Field\FieldItemInterface $field_item */
     $target_entity = $field_item->get('entity')->getValue();
@@ -68,7 +71,7 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
     // If the parent entity passed in a langcode, unset it before normalizing
     // the target entity. Otherwise, untranslatable fields of the target entity
     // will include the langcode.
-    $langcode = isset($context['langcode']) ? $context['langcode'] : NULL;
+    $langcode = $context['langcode'] ?? NULL;
     unset($context['langcode']);
     // Limiting to uuid makes sure that we only get one child from base entity
     // if not we could end traversing forever since there is no way
@@ -90,15 +93,14 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
         $field_item->getParent()
           ->getName()
       );
-      $field_keys = isset($field_mappings['properties']) ?
-            $field_mappings['properties'] :
+      $field_keys = $field_mappings['properties'] ??
             [$field_item->getParent()->getName()];
 
       // Value in this case is the target entity, so if a callback exists
       // it should work against that.
       if (!empty($field_mappings['datatype_callback'])) {
         $callback = $field_mappings['datatype_callback']['callable'];
-        $arguments = isset($field_mappings['datatype_callback']['arguments']) ? $field_mappings['datatype_callback']['arguments'] : NULL;
+        $arguments = $field_mappings['datatype_callback']['arguments'] ?? NULL;
         $transformed_value = call_user_func($callback, $target_entity, $arguments);
         // If the config says it is an @id, we'll save it as an @id.
         if (!empty($field_mappings['datatype']) && $field_mappings['datatype'] == '@id') {
@@ -176,6 +178,15 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
       }
       return $uuid;
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      EntityReferenceItem::class => TRUE,
+    ];
   }
 
 }

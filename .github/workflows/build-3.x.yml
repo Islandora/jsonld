@@ -22,8 +22,12 @@ jobs:
     strategy:
       matrix:
         php-versions: ["8.1", "8.2", "8.3"]
-        drupal-version: ["10.2.x", "10.3.x", "10.4.x-dev"]
-
+        drupal-version: ["10.3.x", "10.4.x-dev", "11.0.x"]
+        exclude:
+          - drupal-version: "11.0.x"
+            php-versions: "8.1"
+          - drupal-version: "11.0.x"
+            php-versions: "8.2"
     env:
       DRUPAL_VERSION: ${{ matrix.drupal-version }}
       SCRIPT_DIR: ${{ github.workspace }}/islandora_ci
@@ -108,4 +112,4 @@ jobs:
       - name: PHPUNIT tests
         run: |
           cd $DRUPAL_DIR/web/core
-          $DRUPAL_DIR/vendor/bin/phpunit --verbose --debug
+          $DRUPAL_DIR/vendor/bin/phpunit --debug

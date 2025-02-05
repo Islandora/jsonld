@@ -50,11 +50,14 @@ class JsonLdSettingsForm extends ConfigFormBase {
     ];
 
     $rdf_namespaces = '';
-    foreach ($config->get('rdf_namespaces') as $namespace) {
-      if (isset($mappings_from_hook[$namespace['prefix']])) {
-        unset($mappings_from_hook[$namespace['prefix']]);
+    $namespaces = $config->get('rdf_namespaces');
+    if(is_array($namespaces) || is_object($namespaces)){
+      foreach ($config->get('rdf_namespaces') as $namespace) {
+        if (isset($mappings_from_hook[$namespace['prefix']])) {
+          unset($mappings_from_hook[$namespace['prefix']]);
+        }
+        $rdf_namespaces .= $namespace['prefix'] . '|' . $namespace['namespace'] . "\n";
       }
-      $rdf_namespaces .= $namespace['prefix'] . '|' . $namespace['namespace'] . "\n";
     }
     $mapping_string = '';
     ksort($mappings_from_hook);

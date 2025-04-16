@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Jsonld;
+namespace Drupal\jsonld;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;

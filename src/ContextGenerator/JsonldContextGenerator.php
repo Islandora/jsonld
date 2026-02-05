@@ -168,7 +168,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
     // rdfmapping object but has no rdf:type.
     if (empty($bundle_rdf_mappings['types'])) {
       $msg = $this->t("Can't generate JSON-LD Context without at least one rdf:type for Entity type @entity_type, Bundle @bundle_name combo.",
-        ['@entity_type' => $entity_type_id, ' @bundle_name' => $bundle]);
+        ['@entity_type' => $entity_type_id, '@bundle_name' => $bundle]);
       $this->logger->warning("@msg",
         [
           '@msg' => $msg,

@@ -7,8 +7,9 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\rdf\Entity\RdfMapping;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\rdf\RdfMappingInterface;
 use Psr\Log\LoggerInterface;
 
@@ -20,6 +21,8 @@ use Psr\Log\LoggerInterface;
  * @package Drupal\jsonld\ContextGenerator
  */
 class JsonldContextGenerator implements JsonldContextGeneratorInterface {
+
+  use StringTranslationTrait;
 
   /**
    * Constant Naming convention used to prefix name cache bins($cid)
@@ -69,6 +72,13 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
   protected $logger;
 
   /**
+   * Injected Module Handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * Cached field type mappings.
    *
    * @var array
@@ -88,13 +98,16 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
    *   Caching Backend.
    * @param \Psr\Log\LoggerInterface $logger_channel
    *   Our Logging Channel.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
    */
-  public function __construct(EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $bundle_info, EntityTypeManagerInterface $entity_manager, CacheBackendInterface $cache_backend, LoggerInterface $logger_channel) {
+  public function __construct(EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $bundle_info, EntityTypeManagerInterface $entity_manager, CacheBackendInterface $cache_backend, LoggerInterface $logger_channel, ModuleHandlerInterface $module_handler) {
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeManager = $entity_manager;
     $this->bundleInfo = $bundle_info;
     $this->cache = $cache_backend;
     $this->logger = $logger_channel;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -105,7 +118,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
     $cache = $this->cache->get($cid);
     $data = '';
     if (!$cache) {
-      $rdfMapping = RdfMapping::load($ids);
+      $rdfMapping = $this->entityTypeManager->getStorage('rdf_mapping')->load($ids);
       // Our whole chain of exceptions will never happen
       // because RdfMapping:load returns NULL on non existance
       // Which forces me to check for it
@@ -115,7 +128,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
         $data = $this->writeCache($rdfMapping, $cid);
       }
       else {
-        $msg = t("Can't generate JSON-LD Context for @ids without RDF Mapping present.",
+        $msg = $this->t("Can't generate JSON-LD Context for @ids without RDF Mapping present.",
           ['@ids' => $ids]);
         $this->logger->warning("@msg",
           [
@@ -154,7 +167,7 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
     // This only generates an Exception if there is an
     // rdfmapping object but has no rdf:type.
     if (empty($bundle_rdf_mappings['types'])) {
-      $msg = t("Can't generate JSON-LD Context without at least one rdf:type for Entity type @entity_type, Bundle @bundle_name combo.",
+      $msg = $this->t("Can't generate JSON-LD Context without at least one rdf:type for Entity type @entity_type, Bundle @bundle_name combo.",
         ['@entity_type' => $entity_type_id, ' @bundle_name' => $bundle]);
       $this->logger->warning("@msg",
         [
@@ -333,11 +346,11 @@ class JsonldContextGenerator implements JsonldContextGeneratorInterface {
     // yet for this instance.
     if (empty($this->fieldMappings)) {
       // Cribbed from rdf module's rdf_get_namespaces.
-      \Drupal::moduleHandler()->invokeAllWith(self::FIELD_MAPPPINGS_HOOK, function (callable $hook, string $module) {
+      $this->moduleHandler->invokeAllWith(self::FIELD_MAPPPINGS_HOOK, function (callable $hook, string $module) {
         foreach ($hook() as $field => $mapping) {
           if (array_key_exists($field, $this->fieldMappings)) {
             $this->logger->warning(
-              t('Tried to map @field_type to @new_type, but @field_type is already mapped to @orig_type.', [
+              $this->t('Tried to map @field_type to @new_type, but @field_type is already mapped to @orig_type.', [
                 '@field_type' => $field,
                 '@new_type' => $mapping['@type'],
                 '@orig_type' => $this->fieldMappings[$field]['@type'],

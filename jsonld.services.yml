@@ -36,7 +36,7 @@ services:
     arguments: ['jsonld']
   jsonld.contextgenerator:
     class: Drupal\jsonld\ContextGenerator\JsonldContextGenerator
-    arguments: ['@entity_field.manager','@entity_type.bundle.info','@entity_type.manager', '@cache.default', '@logger.channel.jsonld']
+    arguments: ['@entity_field.manager','@entity_type.bundle.info','@entity_type.manager', '@cache.default', '@logger.channel.jsonld', '@module_handler']
   jsonld.normalizer_utils:
     class: Drupal\jsonld\Utils\JsonldNormalizerUtils
     arguments: ['@config.factory', '@language_manager', '@router.route_provider']

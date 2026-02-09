@@ -73,7 +73,8 @@ class JsonldContextGeneratorTest extends JsonldKernelTestBase {
         $this->container->get('entity_type.bundle.info'),
         $this->container->get('entity_type.manager'),
         $this->container->get('cache.default'),
-        $this->container->get('logger.channel.jsonld')
+        $this->container->get('logger.channel.jsonld'),
+        $this->container->get('module_handler')
       );
 
   }
@@ -127,7 +128,7 @@ class JsonldContextGeneratorTest extends JsonldKernelTestBase {
     // This should throw the expected Exception.
     $newEntity = $this->createContentType();
     $rdfMapping = rdf_get_mapping('entity_test', $newEntity->id());
-    $this->theJsonldContextGenerator->getContext('entity_test.' . $newEntity->id());
+    $this->theJsonldContextGenerator->generateContext($rdfMapping);
   }
 
   /**

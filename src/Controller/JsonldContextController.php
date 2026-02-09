@@ -7,7 +7,6 @@ use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\jsonld\ContextGenerator\JsonldContextGeneratorInterface;
-use Drupal\rdf\Entity\RdfMapping;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -75,7 +74,7 @@ class JsonldContextController extends ControllerBase {
       // For now deal with Cache dependencies manually.
       $meta = new CacheableMetadata();
       $meta->setCacheContexts(['user.permissions', 'ip', 'url']);
-      $meta->setCacheTags(RdfMapping::load("$entity_type.$bundle")->getCacheTags());
+      $meta->setCacheTags($this->entityTypeManager()->getStorage('rdf_mapping')->load("$entity_type.$bundle")->getCacheTags());
       $meta->setCacheMaxAge(Cache::PERMANENT);
       $response->addCacheableDependency($meta);
     }
